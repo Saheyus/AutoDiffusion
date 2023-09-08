@@ -1,0 +1,74 @@
+﻿@using System.Text;
+@using AutoDiffusion.Services;
+@using Microsoft.AspNetCore.WebUtilities
+@inject IHostEnvironment Env
+@inject NavigationManager NavigationManager
+@inject Services.RefreshService RefreshService
+@inject IJSRuntime JSRuntime
+
+<h1>Autodiffusion</h1>
+
+<ul class="list-unstyled">
+    @if (Folders != null)
+    {
+        @foreach (var folder in Folders)
+        {
+            <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
+                <button class="btn btn-primary btn-block .text-center" @onclick="() => NavigateToFolder(folder)">@folder</button>
+            </li>
+        }
+    }
+    else
+    {
+        <li>Loading...</li>
+    }
+    <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
+        <button class="btn btn-primary btn-block .text-centery" @onclick="Generate">RandomWords</button>
+    </li>
+    <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
+        <button class="btn btn-primary btn-block .text-centery" @onclick="NavigateToNames">Names</button>
+    </li>
+</ul>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">@ErrorMessage</div>
+}
+
+@code {
+    public string[] Folders { get; set; }
+    public string ErrorMessage { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFolders();
+    }
+
+    private Task LoadFolders()
+    {
+        var fullDirectoryPath = Path.Combine("wwwroot", "galleries");
+        Folders = Directory.GetDirectories(fullDirectoryPath)
+                          .Select(dir => new DirectoryInfo(dir).Name)
+                          .ToArray();
+        return Task.CompletedTask;
+    }
+
+
+    private void NavigateToFolder(string folder)
+    {
+        var url = $"{NavigationManager.BaseUri}Carousel?folder={folder}";
+        NavigationManager.NavigateTo(url, true);
+    }
+
+    private void Generate()
+    {
+        NavigationManager.NavigateTo("/RandomWords"); 
+    }
+
+    private void NavigateToNames()
+    {
+        NavigationManager.NavigateTo("/Names"); 
+    }
+
+}

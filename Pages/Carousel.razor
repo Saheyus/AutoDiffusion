@@ -1,0 +1,138 @@
+﻿@page "/Carousel"
+@page "/Carousel/{folder}"
+
+@using System.Text;
+@using Microsoft.AspNetCore.WebUtilities
+@inject IHostEnvironment Env
+@inject NavigationManager NavigationManager
+@inject Services.RefreshService RefreshService
+<style>
+    body {
+        background-color: yellow;
+    }
+</style>
+<div id="carouselExampleIndicators" class="carousel slide carousel-fade limit-size" data-bs-ride="carousel" data-bs-interval="false" style="max-width: 1024px;">
+    <div class="carousel-inner">
+        @for (var i = 0; i < Data.Count; i++)
+        {
+            var item = Data[i];
+            <div class="carousel-item @((i == 0) ? "active" : "")">
+                <div class="carousel-container">
+                    <img src="@item.ImageUrl" class="d-block w-100 carousel-image" title="@item.Prompt" alt="Slide representing @item.Prompt">
+                    <h5 class="carousel-text d-none d-sm-block" style="background-color: rgba(0, 0, 0, 0.5);">@item.Text</h5>
+                    <div class="carousel-indicators">
+                        @for (var j = 0; j < Data.Count; j++)
+                        {
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="@j" class="@((j == i) ? "active" : "")" aria-current="@((j == 0) ? "true" : "false")" aria-label="Slide @j"></button>
+                        }
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </a>
+                </div>
+                <div class="carousel-fulltext text-white">@item.FullText</div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+
+
+@code {
+    [Parameter]
+    public string folder { get; set; }
+
+    public class CarouselItem
+    {
+        public string? ImageUrl { get; set; }
+        public string? Text { get; set; }
+        public string? FullText { get; set; }
+        public string? Prompt { get; set; }
+        public int Order { get; set; }
+    }
+
+    public List<CarouselItem> Data { get; set; } = new List<CarouselItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        RefreshService.OnRefreshRequested += Refresh;
+        await LoadData();
+    }
+
+    protected async Task LoadData()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+        folder = queryParameters.TryGetValue("folder", out var folderValue) ? folderValue.ToString() : null;
+
+        var imageDirectory = Path.Combine(Env.ContentRootPath, "wwwroot", "galleries", folder);
+        var files = Directory.EnumerateFiles(imageDirectory, "*.png");
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        foreach (var file in files)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(file);
+            var prefix = fileName.Split("_")[0]; // Get the prefix before "_"
+            var textFiles = Directory.EnumerateFiles(imageDirectory, $"{prefix}_paragraphe.txt");
+            var promptFiles = Directory.EnumerateFiles(imageDirectory, $"{prefix}_prompt.txt");
+
+            foreach (var textFile in textFiles)
+            {
+                var fullText = await File.ReadAllTextAsync(textFile, Encoding.GetEncoding(1252));
+
+                // Utilisation de la fonction ExtractWords :
+                var text = ExtractWords(fullText, 12);
+
+                var imageUrl = Path.Combine("galleries", folder, Path.GetFileName(file));
+                string prompt = "";
+                foreach (var promptFile in promptFiles)
+                {
+                    prompt = await File.ReadAllTextAsync(promptFile, Encoding.GetEncoding(1252));
+                }
+                Data.Add(new CarouselItem { ImageUrl = imageUrl, Text = text, FullText = fullText, Prompt = prompt, Order = int.Parse(prefix) });
+            }
+        }
+
+        // Sort the Data list based on the Order field.
+        Data = Data.OrderBy(d => d.Order).ToList();
+    }
+
+    private void Refresh()
+    {
+        LoadData().Wait();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        RefreshService.OnRefreshRequested -= Refresh;
+    }
+
+    private string ExtractWords(string text, int wordCount)
+    {
+        var words = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        var count = Math.Min(wordCount, words.Length);
+        var resultWords = words.Take(count).ToList();
+        while (count < words.Length &&
+               !(resultWords.Last().Any(c => c == '.' || c == '!' || c == '?')))
+        {
+            resultWords.Add(words[count]);
+            count++;
+        }
+        return string.Join(' ', resultWords);
+    }
+
+    void RefreshPage()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+}

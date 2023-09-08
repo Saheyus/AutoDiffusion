@@ -1,0 +1,158 @@
+﻿@page "/RandomWords"
+@using AutoDiffusion.Services;
+@using AutoDiffusion.Models;
+@inject RandomWordService RandomWord
+@inject INameService NameService
+@inject ConfigService ConfigService
+
+<h1 class="text-white" style="margin-bottom: 20px;">Mots aléatoires</h1>
+<div class="d-flex">
+    <div style="flex: 4; margin-right: 10px;">
+<form>
+    <div class="form-group row">
+        <label for="languageSelect" class="col-form-label col-sm-1 text-light">Langue:</label>
+        <div class="col-sm-4">
+            <select id="languageSelect" @oninput="OnLanguageSelection" class="form-control">
+                @foreach (string language in ConfigService.Config.SupportedLanguages)
+                {
+                    <option value="@language">@language</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group row">
+                <label for="categorySelect" class="col-form-label col-sm-1 text-light">Type de mot:</label>
+        <div class="col-sm-4">
+            <select id="categorySelect" @oninput="OnCategorySelection" class="form-control">
+                @foreach (string category in ConfigService.Config.SupportedCategories)
+                {
+                    <option value="@category">@category</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- Minimum Letters -->
+    <div class="form-group row">
+                <label for="minLetters" class="col-sm-3 col-form-label text-light">Min. Lettres:</label>
+        <div class="col-sm-6">
+            <input type="range" id="minLetters" min="1" max="8" @bind="ConfigService.Config.MinLetters" class="form-control-range" />
+                    <span class="text-light">@ConfigService.Config.MinLetters</span>
+        </div>
+    </div>
+
+    <!-- Maximum Letters -->
+    <div class="form-group row">
+                <label for="maxLetters" class="col-sm-3 col-form-label text-light">Max. Lettres:</label>
+        <div class="col-sm-6">
+            <input type="range" id="maxLetters" min="3" max="16" @bind="ConfigService.Config.MaxLetters" class="form-control-range" />
+                    <span class="text-light">@ConfigService.Config.MaxLetters</span>
+        </div>
+    </div>
+
+    <!-- Accent Modifier -->
+    <div class="form-group row">
+                <label for="accentModifier" class="col-sm-3 col-form-label text-light">Modificateur d'accent:</label>
+        <div class="col-sm-6">
+            <input type="range" id="accentModifier" min="0" max="5" @bind="ConfigService.Config.AccentModifier" class="form-control-range" />
+            <span class="text-light">@ConfigService.Config.AccentModifier</span>
+        </div>
+    </div>
+</form>
+
+        <button @onclick="GenerateRandomWords" class="btn btn-light btn-rounded btn-lg fs-5 text">Génération aléatoire</button>
+
+<div style="max-width: 90%;">
+    <div class="d-flex flex-wrap mt-3">
+        @foreach (string word in RandomWord.GeneratedWords)
+        {
+            <div class="card mr-3 mb-3" style="width: 14.5rem; height: 3.6rem;">
+                <div class="card-body d-flex" style="align-items: baseline; padding-top: 0.8rem;">
+                            <h5 class="card-title mb-0 flex-grow-1" style="font-size: @GetFontSize(word); ">@word</h5>
+                            <button @onclick="(() => SaveWord(word))" type="button" class="btn btn-danger btn-floating" data-mdb-ripple-color="dark"><i class="fas fa-heart"></i></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+</div>
+    <div style="flex: 1;">
+        <h3 class="text-white">Saved Words</h3>
+        <ul class="list-group list-group-light">
+            @foreach (string word in savedWords)
+            {
+                <li class="list-group-item fs-4 d-flex justify-content-between align-items-center">
+                    <span>@word</span>
+                    <button @onclick="() => DeleteName(word)" type="button" class="btn btn-dark btn-floating" data-mdb-ripple-color="dark"><i class="fas fa-trash"></i></button>
+                </li>
+            }
+        </ul>
+    </div>
+
+</div>
+
+@code {
+    private List<string> savedWords = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ConfigService.LoadConfiguration();
+        ConfigService.LoadCategories();
+        ConfigService.GetConfig();
+        await UpdateSavedWords();  
+    }
+
+    private async void GenerateRandomWords()
+    {
+        await RandomWord.Generate();
+        StateHasChanged();
+    }
+    private async Task SaveWord(string word)
+    {
+        var currentConfig = ConfigService.Config;
+
+        var generatedWord = new NameModel
+        {
+            Name = word,
+            CountryName = currentConfig.SelectedLanguage,
+            Type = currentConfig.SelectedCategory
+        };
+        RandomWord.SaveGeneratedWord(generatedWord);
+        await UpdateSavedWords();
+    }
+    private async Task UpdateSavedWords()
+    {
+        savedWords = await NameService.GetGeneratedWordsByCountryAndCategoryAsync(ConfigService.Config.SelectedLanguage, ConfigService.Config.SelectedCategory);
+        StateHasChanged();
+    }
+
+    private async Task DeleteName(string word)
+    {
+        savedWords.Remove(word);;
+        await NameService.DeleteGeneratedNameAsync(word);
+    }
+
+    private async Task OnLanguageSelection(ChangeEventArgs e)
+    {
+        ConfigService.Config.SelectedLanguage = e.Value.ToString();
+        RandomWord.GeneratedWords.Clear();  // Clear generated words
+        await UpdateSavedWords();
+    }
+
+    private async Task OnCategorySelection(ChangeEventArgs e)
+    {
+        ConfigService.Config.SelectedCategory = e.Value.ToString();
+        RandomWord.GeneratedWords.Clear();  // Clear generated words
+        await UpdateSavedWords();
+    }
+
+    string GetFontSize(string word)
+    {
+        const double baseSize = 1.5;
+        const double reductionFactor = 0.02; 
+        double newSize = Math.Max(baseSize - word.Length * reductionFactor, 1);
+        return $"{newSize}rem";
+    }
+
+}

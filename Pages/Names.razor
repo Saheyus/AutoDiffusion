@@ -1,0 +1,168 @@
+﻿@page "/names"
+@using AutoDiffusion.Services
+@using AutoDiffusion.Models
+@inject INameService NameService
+@inject ProbabilityService ProbabilityService
+
+<h3 class="text-white">Names</h3>
+
+<div>
+    <input type="text" placeholder="Filter by name" @oninput="ApplyFilter" />
+    <select @onchange="ApplyCountryFilter" value="@_selectedCountry">
+        @foreach (var country in _uniqueCountries)
+        {
+            <option value="@country">@country</option>
+        }
+    </select>
+    <select @onchange="ApplyTypeFilter" value="@_selectedType">
+        @foreach (var type in _uniqueTypes)
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+</div>
+
+
+<button @onclick="AddName">Add Name</button>
+<button @onclick="GenerateProbabilities">Regenerate odds</button>
+<button @onclick="GenerateAllProbabilities">Generate all odds</button>
+
+<table class="table text-white">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Country Code</th>
+        <th>Country Name</th>
+        <th>Type</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var name in _displayNames)
+    {
+        <tr>
+            <td>@name.ID</td>
+            <td>@name.Name</td>
+            <td>@name.CountryCode</td>
+            <td>@name.CountryName</td>
+            <td>@name.Type</td>
+            <td>
+                <button @onclick="() => EditName(name)">Edit</button>
+                <button @onclick="() => DeleteName(name.ID)">Delete</button>
+            </td>
+        </tr>
+    }
+    <button @onclick="PreviousPage">Previous</button>
+    <button @onclick="NextPage">Next</button>
+    </tbody>
+</table>
+
+@code {
+    private List<NameModel> _allNames = new();
+    private List<NameModel> _filteredNames = new();
+    private List<NameModel> _displayNames = new();
+    private string _filterName = string.Empty;
+    private const int PageSize = 100;
+    private int _currentPage = 1;
+    private string _selectedCountry = string.Empty;
+    private string _selectedType = string.Empty;
+    private HashSet<string> _uniqueCountries = new HashSet<string>();
+    private HashSet<string> _uniqueTypes = new HashSet<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllData();
+        _selectedCountry = _uniqueCountries.FirstOrDefault();
+        _selectedType = _uniqueTypes.FirstOrDefault(); 
+
+        ApplyCombinedFilter();
+    }
+
+    private async Task LoadAllData()
+    {
+        _allNames = await NameService.GetAllNamesAsync();
+        _uniqueCountries = await NameService.GetUniqueCountriesAsync();
+        _uniqueTypes = await NameService.GetUniqueTypesAsync();
+    }
+
+    private async Task NextPage()
+    {
+        _currentPage++;
+        PaginateFilteredNames();
+    }
+
+    private async Task PreviousPage()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+            PaginateFilteredNames();
+        }
+    }
+
+    private void ApplyFilter(ChangeEventArgs e)
+    {
+        _filterName = e.Value.ToString();
+        ApplyCombinedFilter();
+    }
+
+    private void ApplyCountryFilter(ChangeEventArgs e)
+    {
+        _selectedCountry = e.Value.ToString();
+        ApplyCombinedFilter();
+    }
+
+    private void ApplyTypeFilter(ChangeEventArgs e)
+    {
+        _selectedType = e.Value.ToString();
+        ApplyCombinedFilter();
+    }
+
+    private void ApplyCombinedFilter()
+    {
+        _filteredNames = _allNames.Where(n =>
+            (string.IsNullOrEmpty(_filterName) || n.Name.Contains(_filterName, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(_selectedCountry) || n.CountryName == _selectedCountry) &&
+            (string.IsNullOrEmpty(_selectedType) || n.Type == _selectedType)
+        ).ToList();
+        _currentPage = 1;
+        PaginateFilteredNames();
+    }
+
+    private void PaginateFilteredNames()
+    {
+        _displayNames = _filteredNames.Skip((_currentPage - 1) * PageSize).Take(PageSize).ToList();
+        StateHasChanged();
+    }
+
+    private async Task AddName()
+    {
+        // var newName = new NameModel { Name = "NewName", CountryCode = "FR", CountryName = "France", Type = "Last" };
+        // await NameService.AddNameAsync(newName);
+        // _displayNames.Add(newName);
+    }
+
+    private async Task GenerateProbabilities()
+    {
+        ProbabilityService.GenerateProbabilities(_selectedCountry, _selectedType, _filteredNames);
+    }
+
+    private async Task GenerateAllProbabilities()
+    {
+        List<NameModel> allNames = await NameService.GetAllNamesAsync();
+        await ProbabilityService.GenerateAllProbabilities(allNames);
+    }
+
+    private async Task EditName(NameModel nameModel)
+    {
+        // nameModel.Name = "EditedName";  // Just an example
+        // await NameService.UpdateNameAsync(nameModel);
+    }
+
+    private async Task DeleteName(int id)
+    {
+        await NameService.DeleteNameAsync(id);
+        _displayNames.RemoveAll(n => n.ID == id);
+    }
+}
