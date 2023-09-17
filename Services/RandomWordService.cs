@@ -36,11 +36,11 @@ public class RandomWordService
             string currentLetter = "", randomWord = "", lastLetters = " ";
             var numberOfWords = 0;
 
-            ConfigModel config = _configService.GetConfig();
+            ConfigModel config = await _configService.GetConfig();
 
             nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
             var popularNames = await _nameService.GetPopularNamesByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
-            numberOfWords = 21;
+            numberOfWords = 20;
 
             for (var i = 0; i < numberOfWords; i++)
             {
@@ -188,11 +188,11 @@ public class RandomWordService
 
     private bool IsWordUnique(SqlConnection connection, NameModel generatedWord)
     {
-        const string checkQuery = "SELECT COUNT(*) FROM GeneratedWords WHERE GeneratedWord = @word AND CountryName = @countryName AND Type = @type";
+        const string checkQuery = "SELECT COUNT(*) FROM GeneratedWords WHERE GeneratedWord = @word AND Language = @countryName AND Type = @type";
         using var checkCmd = new SqlCommand(checkQuery, connection);
 
         checkCmd.Parameters.AddWithValue("@word", generatedWord.Name);
-        checkCmd.Parameters.AddWithValue("@countryName", generatedWord.CountryName);
+        checkCmd.Parameters.AddWithValue("@countryName", generatedWord.Language);
         checkCmd.Parameters.AddWithValue("@type", generatedWord.Type);
 
         int count = Convert.ToInt32(checkCmd.ExecuteScalar());
@@ -201,15 +201,16 @@ public class RandomWordService
 
     private void InsertWord(SqlConnection connection, NameModel generatedWord)
     {
-        const string insertQuery = "INSERT INTO GeneratedWords (GeneratedWord, CountryName, Type) VALUES (@word, @countryName, @type)";
+        const string insertQuery = "INSERT INTO GeneratedWords (GeneratedWord, Language, Type) VALUES (@word, @countryName, @type)";
         using var insertCmd = new SqlCommand(insertQuery, connection);
 
         insertCmd.Parameters.AddWithValue("@word", generatedWord.Name);
-        insertCmd.Parameters.AddWithValue("@countryName", generatedWord.CountryName);
+        insertCmd.Parameters.AddWithValue("@countryName", generatedWord.Language);
         insertCmd.Parameters.AddWithValue("@type", generatedWord.Type);
 
         insertCmd.ExecuteNonQuery();
     }
+
 
 }
 

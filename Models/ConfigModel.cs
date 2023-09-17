@@ -10,7 +10,7 @@ namespace AutoDiffusion.Models
         [Column("ID")]
         public int Id { get; set; }
 
-        [Column("Langue")]
+        [Column("Language")]
         public string? SelectedLanguage { get; set; }
 
         [Column("Categorie")]

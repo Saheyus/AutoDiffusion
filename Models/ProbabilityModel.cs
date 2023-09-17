@@ -9,7 +9,7 @@ namespace AutoDiffusion.Models
         public string LastLetters { get; set; }
         public string NextLetter { get; set; }
         public double Probability { get; set; }
-        public string CountryName { get; set; }
+        public string Language { get; set; }
         public string Type { get; set; }
     }
 }

@@ -23,10 +23,13 @@
         <li>Loading...</li>
     }
     <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
-        <button class="btn btn-primary btn-block .text-centery" @onclick="Generate">RandomWords</button>
+        <button class="btn btn-primary btn-block .text-centery" @onclick="Generate">Random Words</button>
     </li>
     <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
         <button class="btn btn-primary btn-block .text-centery" @onclick="NavigateToNames">Names</button>
+    </li>
+    <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
+        <button class="btn btn-primary btn-block .text-centery" @onclick="NavigateToMixer">Language Mixer</button>
     </li>
 </ul>
 
@@ -69,6 +72,11 @@
     private void NavigateToNames()
     {
         NavigationManager.NavigateTo("/Names"); 
+    }
+
+    private void NavigateToMixer()
+    {
+        NavigationManager.NavigateTo("/LanguageMixer"); 
     }
 
 }

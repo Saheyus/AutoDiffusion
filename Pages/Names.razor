@@ -44,8 +44,7 @@
         <tr>
             <td>@name.ID</td>
             <td>@name.Name</td>
-            <td>@name.CountryCode</td>
-            <td>@name.CountryName</td>
+            <td>@name.Language</td>
             <td>@name.Type</td>
             <td>
                 <button @onclick="() => EditName(name)">Edit</button>
@@ -81,10 +80,17 @@
 
     private async Task LoadAllData()
     {
-        _allNames = await NameService.GetAllNamesAsync();
-        _uniqueCountries = await NameService.GetUniqueCountriesAsync();
-        _uniqueTypes = await NameService.GetUniqueTypesAsync();
+        var allNamesTask = NameService.GetAllNamesAsync();
+        var uniqueCountriesTask = NameService.GetUniqueCountriesAsync();
+        var uniqueTypesTask = NameService.GetUniqueTypesAsync();
+
+        await Task.WhenAll(allNamesTask, uniqueCountriesTask, uniqueTypesTask);
+
+        _allNames = allNamesTask.Result;
+        _uniqueCountries = uniqueCountriesTask.Result;
+        _uniqueTypes = uniqueTypesTask.Result;
     }
+
 
     private async Task NextPage()
     {
@@ -123,7 +129,7 @@
     {
         _filteredNames = _allNames.Where(n =>
             (string.IsNullOrEmpty(_filterName) || n.Name.Contains(_filterName, StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrEmpty(_selectedCountry) || n.CountryName == _selectedCountry) &&
+            (string.IsNullOrEmpty(_selectedCountry) || n.Language == _selectedCountry) &&
             (string.IsNullOrEmpty(_selectedType) || n.Type == _selectedType)
         ).ToList();
         _currentPage = 1;
@@ -138,7 +144,7 @@
 
     private async Task AddName()
     {
-        // var newName = new NameModel { Name = "NewName", CountryCode = "FR", CountryName = "France", Type = "Last" };
+        // var newName = new NameModel { Name = "NewName", Language = "France", Type = "Last" };
         // await NameService.AddNameAsync(newName);
         // _displayNames.Add(newName);
     }

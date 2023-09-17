@@ -14,9 +14,9 @@ namespace AutoDiffusion.Services
             Config = new ConfigModel();
         }
 
-        public ConfigModel GetConfig()
+        public Task<ConfigModel> GetConfig()
         {
-            return new ConfigModel
+            return Task.FromResult(new ConfigModel
             {
                 SelectedLanguage = Config.SelectedLanguage,
                 SelectedCategory = Config.SelectedCategory,
@@ -24,58 +24,65 @@ namespace AutoDiffusion.Services
                 MaxLetters = Config.MaxLetters,
                 SupportedLanguages = Config.SupportedLanguages,
                 SupportedCategories = Config.SupportedCategories,
-            };
+            });
         }
 
-        public void LoadConfiguration()
+        public async Task LoadConfiguration()
         {
-            using var connection = new SqlConnection(_DBConfiguration.GetConnectionString("DefaultConnection"));
-            connection.Open();
-            string query = "SELECT * FROM WordParameters WHERE Langue = @SelectedLanguage AND Categorie = @SelectedCategory";
-            using (SqlCommand cmd = new SqlCommand(query, connection))
+            try
             {
-                cmd.Parameters.AddWithValue("@SelectedLanguage", string.IsNullOrEmpty(Config.SelectedLanguage) ? "France" : Config.SelectedLanguage);
-                cmd.Parameters.AddWithValue("@SelectedCategory", string.IsNullOrEmpty(Config.SelectedCategory) ? "Female" : Config.SelectedCategory);
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                using var connection = new SqlConnection(_DBConfiguration.GetConnectionString("DefaultConnection"));
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM WordParameters WHERE Language = @SelectedLanguage AND Categorie = @SelectedCategory";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
-                    if (reader.Read())
+                    cmd.Parameters.AddWithValue("@SelectedLanguage", string.IsNullOrEmpty(Config.SelectedLanguage) ? "French" : Config.SelectedLanguage);
+                    cmd.Parameters.AddWithValue("@SelectedCategory", string.IsNullOrEmpty(Config.SelectedCategory) ? "Female" : Config.SelectedCategory);
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
-                        Config.MinLetters = reader["MinLetters"] is DBNull ? 2 : Convert.ToInt32(reader["MinLetters"]);
-                        Config.MaxLetters = reader["MaxLetters"] is DBNull ? 10 : Convert.ToInt32(reader["MaxLetters"]);
-                        Config.AccentModifier = reader["AccentModifier"] is DBNull ? 0.1 : Convert.ToDouble(reader["AccentModifier"]);
+                        if (await reader.ReadAsync())
+                        {
+                            Config.MinLetters = reader["MinLetters"] is DBNull ? 2 : Convert.ToInt32(reader["MinLetters"]);
+                            Config.MaxLetters = reader["MaxLetters"] is DBNull ? 10 : Convert.ToInt32(reader["MaxLetters"]);
+                            Config.AccentModifier = reader["AccentModifier"] is DBNull ? 0.1 : Convert.ToDouble(reader["AccentModifier"]);
+                        }
                     }
                 }
             }
-            connection.Close();
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
-        public void LoadCategories()
+        public async Task LoadCategories()
         {
-            Config.SupportedLanguages = LoadCategories("Langue").Where(lang => !string.IsNullOrEmpty(lang) && lang != "DEFAULT").ToList();
-            Config.SupportedCategories = LoadCategories("Categorie").Where(cat => !string.IsNullOrEmpty(cat) && cat != "DEFAULT").ToList();
+            Config.SupportedLanguages = (await LoadCategories("Language")).Where(lang => !string.IsNullOrEmpty(lang) && lang != "DEFAULT").ToList();
+            Config.SupportedCategories = (await LoadCategories("Categorie")).Where(cat => !string.IsNullOrEmpty(cat) && cat != "DEFAULT").ToList();
             Config.SelectedLanguage = Config.SupportedLanguages.FirstOrDefault();
             Config.SelectedCategory = Config.SupportedCategories.FirstOrDefault();
         }
-        public List<string> LoadCategories(string columnName)
+
+        private async Task<List<string>> LoadCategories(string columnName)
         {
-            using var connection = new SqlConnection(_DBConfiguration.GetConnectionString("DefaultConnection"));
-            connection.Open();
             string query = $"SELECT DISTINCT {columnName} FROM WordParameters";
 
-            using (connection)
+            await using var connection = new SqlConnection(_DBConfiguration.GetConnectionString("DefaultConnection"));
+            connection.Open();
+            await using (SqlCommand command = new SqlCommand(query, connection))
+            await using (SqlDataReader reader = await command.ExecuteReaderAsync())
             {
-                using (SqlCommand command = new SqlCommand(query, connection))
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    List<string> values = new List<string>();
+                List<string> values = new List<string>();
 
-                    while (reader.Read())
-                    {
-                        string value = reader[0] != DBNull.Value ? reader.GetString(0) : null;
-                        values.Add(value);
-                    }
-                    return values;
+                while (reader.Read())
+                {
+                    string value = reader[0] != DBNull.Value ? reader.GetString(0) : null;
+                    values.Add(value);
                 }
+                return values;
             }
         }
     }

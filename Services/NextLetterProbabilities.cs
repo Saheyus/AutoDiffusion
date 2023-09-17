@@ -22,7 +22,7 @@ namespace AutoDiffusion.Services
                 connection.Open();
             }
             Probabilities.Clear();
-            string query = $"SELECT LastLetters, NextLetter, Probability  FROM probabilities WHERE CountryName = '{language}' AND Type = '{category}'";
+            string query = $"SELECT LastLetters, NextLetter, Probability  FROM probabilities WHERE Language = '{language}' AND Type = '{category}'";
 
             using (SqlCommand cmd = new SqlCommand(query, connection))
             {
