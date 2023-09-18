@@ -80,17 +80,10 @@
 
     private async Task LoadAllData()
     {
-        var allNamesTask = NameService.GetAllNamesAsync();
-        var uniqueCountriesTask = NameService.GetUniqueCountriesAsync();
-        var uniqueTypesTask = NameService.GetUniqueTypesAsync();
-
-        await Task.WhenAll(allNamesTask, uniqueCountriesTask, uniqueTypesTask);
-
-        _allNames = allNamesTask.Result;
-        _uniqueCountries = uniqueCountriesTask.Result;
-        _uniqueTypes = uniqueTypesTask.Result;
+        _allNames = await NameService.GetAllNamesAsync();
+        _uniqueCountries = await NameService.GetUniqueCountriesAsync();
+        _uniqueTypes = await NameService.GetUniqueTypesAsync();
     }
-
 
     private async Task NextPage()
     {
