@@ -15,7 +15,7 @@
         <div class="row align-items-center mb-2">
             <!-- Language dropdown -->
             <div class="col-lg-2">
-                <select @bind="lang.value.Language" class="form-control">
+                <select @onchange="(e) => UpdateLanguage(lang.index, e)" class="form-control" value="@lang.value.Language">
                     @foreach (var language in GetAvailableLanguagesForIndex(lang.index))
                     {
                         <option>@language</option>
@@ -118,6 +118,12 @@
     {
         return availableLanguages.Except(selectedLanguages.Where((value, i) => i != index).Select(x => x.Language));
     }
+
+    private void UpdateLanguage(int index, ChangeEventArgs e)
+    {
+        selectedLanguages[index].Language = e.Value.ToString();
+    }
+
 
     private void AddLanguage()
     {

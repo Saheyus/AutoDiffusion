@@ -26,6 +26,9 @@
         <button class="btn btn-primary btn-block .text-centery" @onclick="Generate">Random Words</button>
     </li>
     <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
+        <button class="btn btn-primary btn-block .text-centery" @onclick="NavigateToFullNames">Full Name Generator</button>
+    </li>
+    <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
         <button class="btn btn-primary btn-block .text-centery" @onclick="NavigateToNames">Names</button>
     </li>
     <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
@@ -67,6 +70,11 @@
     private void Generate()
     {
         NavigationManager.NavigateTo("/RandomWords"); 
+    }
+
+    private void NavigateToFullNames()
+    {
+        NavigationManager.NavigateTo("/FullNames");
     }
 
     private void NavigateToNames()

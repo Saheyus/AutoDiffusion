@@ -1,0 +1,141 @@
+﻿@page "/FullNames"
+@using AutoDiffusion.Services
+@using AutoDiffusion.Models
+@using Autodiffusion.Services
+@inject ConfigService ConfigService
+@inject FullNameService FullNameService
+@inject LanguageService LanguageService
+
+<h1 class="text-white" style="margin-bottom: 20px;">Noms complets</h1>
+<div class="d-flex">
+    <div style="flex: 4; margin-right: 10px;">
+        <form>
+            <div class="form-group row">
+                <label for="languageSelect" class="col-form-label col-sm-1 text-light">Langue:</label>
+                <div class="col-sm-4">
+                    <select id="languageSelect" @bind="selectedLanguage" class="form-control">
+                        @foreach (var lang in languages)
+                        {
+                            <option value="@lang.Language">@lang.Language</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="genderSelect" class="col-form-label col-sm-1 text-light">Genre:</label>
+                <div class="col-sm-4">
+                    <select id="genderSelect" @oninput="OnGenderSelection" class="form-control">
+                        <option value="Male">Homme</option>
+                        <option value="Female">Femme</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="secondChance" class="col-sm-3 col-form-label text-light">Chance de second prénom:</label>
+                <div class="col-sm-6">
+                    <input type="range" id="secondChance" min="0" max="100" step="10" @bind="chanceForSecondFirstName" class="form-control-range" />
+                    <span class="text-light">@chanceForSecondFirstName %</span>
+                </div>
+            </div>
+        </form>
+
+        <button @onclick="GenerateRandomNames" class="btn btn-light btn-rounded btn-lg fs-5">Génération aléatoire</button>
+
+        <div style="max-width: 90%;">
+            <div class="d-flex flex-wrap mt-3">
+                @foreach (FullNameModel fullName in _generatedFullNames)
+                {
+                    <div class="card mr-3 mb-3" style="width: 20rem; height: 3.6rem;">
+                        <div class="card-body d-flex" style="align-items: baseline; padding-top: 0.8rem;">
+                            <h5 class="card-title mb-0 flex-grow-1">@fullName.FullName</h5>
+                            <button @onclick="(() => SaveName(fullName))" type="button" class="btn btn-danger btn-floating" data-mdb-ripple-color="dark"><i class="fas fa-heart"></i></button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div style="flex: 1;">
+        <h3 class="text-white">Saved Names</h3>
+        <ul class="list-group list-group-light">
+            @if(_savedFullNames != null)
+            {
+                @foreach (var name in _savedFullNames)
+                {
+                    <li class="list-group-item fs-4 d-flex justify-content-between align-items-center">
+                        <div>@name?.FullName</div>
+                        <button @onclick="() => DeleteName(name.ID)" type="button" class="btn btn-dark btn-floating" data-mdb-ripple-color="dark"><i class="fas fa-trash"></i></button>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+    private List<FullNameModel>? _savedFullNames = new();
+    private List<FullNameModel>? _generatedFullNames = new();
+    private List<LanguageModel> languages = new List<LanguageModel>();
+    private string selectedGender = "Male";
+    private string selectedLanguage = "English";
+    private int chanceForSecondFirstName = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        languages = await LanguageService.GetLanguagesWithGeneratedWordsAsync();
+        await ConfigService.LoadConfiguration();
+        await UpdateSavedFullNames();
+    }
+
+    private async void GenerateRandomNames()
+    {
+        var fullNames = await FullNameService.GenerateFullNameAsync(selectedLanguage, selectedGender, chanceForSecondFirstName, 18);
+        _generatedFullNames.Clear();
+        foreach (var name in fullNames)
+        {
+            _generatedFullNames.Add(new FullNameModel { FullName = name, Gender = selectedGender });
+        }
+        StateHasChanged(); 
+    }
+
+    private async Task SaveName(FullNameModel name)
+    {
+        await FullNameService.SaveGeneratedFullNameAsync(name);
+        await UpdateSavedFullNames();
+    }
+
+    private async Task UpdateSavedFullNames()
+    {
+        try
+        {
+            _savedFullNames = await FullNameService.GetAsync(selectedGender);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _savedFullNames = new List<FullNameModel>();
+        }
+    }
+
+
+    private async Task DeleteName(int id)
+    {
+        await FullNameService.DeleteAsync(id);
+        await UpdateSavedFullNames();
+    }
+
+    private void OnGenderSelection(ChangeEventArgs e)
+    {
+        selectedGender = e.Value.ToString();
+        _savedFullNames.Clear();
+    }
+
+    private void OnLanguageSelection(ChangeEventArgs e)
+    {
+        selectedLanguage = e.Value.ToString();
+    }
+}
+
+

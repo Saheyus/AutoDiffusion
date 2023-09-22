@@ -1,5 +1,6 @@
 using AutoDiffusion.Services;
 using AutoDiffusion.Data;
+using Autodiffusion.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ builder.Services.AddScoped<RandomWordService>();
 builder.Services.AddSingleton<ConfigService>();
 builder.Services.AddScoped<INameService, NameService>();
 builder.Services.AddScoped<ProbabilityService>();
+builder.Services.AddScoped<FullNameService>();
+builder.Services.AddScoped<LanguageService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
