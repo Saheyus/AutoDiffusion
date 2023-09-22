@@ -37,7 +37,7 @@ namespace AutoDiffusion.Models
 
         [NotMapped]
         public List<string?>? SupportedCategories { get; set; }
-
+        [NotMapped]
         public string? SecondNameChance { get; set; }
     }
 }

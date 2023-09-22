@@ -45,7 +45,7 @@
     <div><input type="text" @bind="newLanguageName" placeholder="New Language Name" /></div>
     <div><button @onclick="SaveMixedLanguage" class="btn btn-success mb-3 mt-2" disabled="@string.IsNullOrEmpty(newLanguageName)">Save</button></div>
     <div class="row">
-        <div class="col-12 col-md-3"> <!-- Only this line changed to align to the left -->
+        <div class="col-12 col-md-3">
             @if (!string.IsNullOrEmpty(feedbackMessage))
             {
                 <div class="alert @alertClass" role="alert">

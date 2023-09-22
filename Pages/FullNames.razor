@@ -85,6 +85,10 @@
     protected override async Task OnInitializedAsync()
     {
         languages = await LanguageService.GetLanguagesWithGeneratedWordsAsync();
+        if (languages.Any())
+        {
+            selectedLanguage = languages[0].Language;
+        }
         await ConfigService.LoadConfiguration();
         await UpdateSavedFullNames();
     }
