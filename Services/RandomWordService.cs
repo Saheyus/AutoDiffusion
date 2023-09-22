@@ -1,7 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
-using System.Globalization;
-using AutoDiffusion.Models;
+﻿using AutoDiffusion.Models;
+using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Globalization;
 
 namespace AutoDiffusion.Services;
 

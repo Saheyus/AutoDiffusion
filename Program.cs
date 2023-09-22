@@ -1,6 +1,6 @@
-using AutoDiffusion.Services;
-using AutoDiffusion.Data;
 using Autodiffusion.Services;
+using AutoDiffusion.Data;
+using AutoDiffusion.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

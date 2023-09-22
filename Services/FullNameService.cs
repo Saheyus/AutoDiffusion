@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AutoDiffusion.Data;
+﻿using AutoDiffusion.Data;
 using AutoDiffusion.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Autodiffusion.Services
 {
@@ -36,7 +36,7 @@ namespace Autodiffusion.Services
                 await _context.SaveChangesAsync();
             }
         }
-        
+
         public async Task<List<string>> GenerateFullNameAsync(string language, string gender, int chanceForSecondFirstName, int count = 1)
         {
             List<string> fullNames = new List<string>();
@@ -65,7 +65,7 @@ namespace Autodiffusion.Services
 
             return fullNames;
         }
-        
+
         private async Task<string> GenerateNameAsync(string Language, string gender)
         {
             // Query the database for names of the given gender and type

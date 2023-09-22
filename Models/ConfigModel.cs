@@ -31,12 +31,12 @@ namespace AutoDiffusion.Models
         [Column("FullPlaceName")]
         public int FullPlaceName { get; set; }
 
-        // Ignored as these are not columns in the table
         [NotMapped]
         public List<string?>? SupportedLanguages { get; set; }
 
         [NotMapped]
         public List<string?>? SupportedCategories { get; set; }
+
         [NotMapped]
         public string? SecondNameChance { get; set; }
     }

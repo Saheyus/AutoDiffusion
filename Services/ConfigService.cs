@@ -1,5 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
-using AutoDiffusion.Models;
+﻿using AutoDiffusion.Models;
+using Microsoft.Data.SqlClient;
 
 namespace AutoDiffusion.Services
 {

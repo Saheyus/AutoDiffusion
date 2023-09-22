@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AutoDiffusion.Services
+﻿namespace AutoDiffusion.Services
 {
     public class RefreshService
     {

@@ -1,7 +1,7 @@
 ﻿using AutoDiffusion.Data;
 using AutoDiffusion.Models;
-using System.Text.RegularExpressions;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AutoDiffusion.Services
 {
@@ -41,7 +41,7 @@ namespace AutoDiffusion.Services
             {
                 Console.WriteLine($"Processing name: {name}");
                 // Case for the first letter of the word
-                string separator = "|"; 
+                string separator = "|";
                 string key = "";
                 key = separator + name[0];
                 freqMap.TryAdd(key, 0);
@@ -74,7 +74,7 @@ namespace AutoDiffusion.Services
                         freqMap.TryAdd(key, 0);
                         freqMap[key]++;
                     }
-                    
+
                     if (key.EndsWith("-|") || Regex.IsMatch(key, @"-\w\|$"))
                     {
                         Console.WriteLine($"Unexpected key found while processing name: {name}");
@@ -206,7 +206,7 @@ namespace AutoDiffusion.Services
             // Delete records from related tables
             var wordParameters = _dbContext.Config.Where(wp => wp.SelectedLanguage == languageToDelete);
             _dbContext.Config.RemoveRange(wordParameters);
-             
+
             var probabilities = _dbContext.Probabilities.Where(p => p.Language == languageToDelete);
             _dbContext.Probabilities.RemoveRange(probabilities);
 
@@ -339,54 +339,54 @@ namespace AutoDiffusion.Services
 
         // Method to calculate Levenshtein Distance
         public static int LevenshteinDistance(string a, string b)
+        {
+            int lenA = a.Length;
+            int lenB = b.Length;
+            var d = new int[lenA + 1, lenB + 1];
+
+            for (int i = 0; i <= lenA; i++)
+                d[i, 0] = i;
+
+            for (int j = 0; j <= lenB; j++)
+                d[0, j] = j;
+
+            for (int i = 1; i <= lenA; i++)
             {
-                int lenA = a.Length;
-                int lenB = b.Length;
-                var d = new int[lenA + 1, lenB + 1];
-
-                for (int i = 0; i <= lenA; i++)
-                    d[i, 0] = i;
-
-                for (int j = 0; j <= lenB; j++)
-                    d[0, j] = j;
-
-                for (int i = 1; i <= lenA; i++)
+                for (int j = 1; j <= lenB; j++)
                 {
-                    for (int j = 1; j <= lenB; j++)
-                    {
-                        int cost = (b[j - 1] == a[i - 1]) ? 0 : 1;
+                    int cost = (b[j - 1] == a[i - 1]) ? 0 : 1;
 
-                        d[i, j] = Math.Min(
-                            Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
-                            d[i - 1, j - 1] + cost);
+                    d[i, j] = Math.Min(
+                        Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
+                        d[i - 1, j - 1] + cost);
+                }
+            }
+            return d[lenA, lenB];
+        }
+
+        // Method to Check Language based on similarity
+        public Dictionary<string, int> CheckLanguage(string word, Dictionary<string, List<string>> languageWords, int threshold)
+        {
+            Dictionary<string, int> matchingLanguages = new Dictionary<string, int>();
+
+            foreach (var language in languageWords.Keys)
+            {
+                int minDistance = int.MaxValue;
+                foreach (var languageWord in languageWords[language])
+                {
+                    int distance = LevenshteinDistance(word.ToLower(), languageWord.ToLower());
+                    if (distance <= threshold && distance < minDistance)
+                    {
+                        minDistance = distance;
                     }
                 }
-                return d[lenA, lenB];
-            }
 
-            // Method to Check Language based on similarity
-            public Dictionary<string, int> CheckLanguage(string word, Dictionary<string, List<string>> languageWords, int threshold)
-            {
-                Dictionary<string, int> matchingLanguages = new Dictionary<string, int>();
-
-                foreach (var language in languageWords.Keys)
+                if (minDistance != int.MaxValue)
                 {
-                    int minDistance = int.MaxValue;
-                    foreach (var languageWord in languageWords[language])
-                    {
-                        int distance = LevenshteinDistance(word.ToLower(), languageWord.ToLower());
-                        if (distance <= threshold && distance < minDistance)
-                        {
-                            minDistance = distance;
-                        }
-                    }
-
-                    if (minDistance != int.MaxValue)
-                    {
-                        matchingLanguages[language] = minDistance;
-                    }
+                    matchingLanguages[language] = minDistance;
                 }
-                return matchingLanguages;
             }
+            return matchingLanguages;
+        }
     }
 }
