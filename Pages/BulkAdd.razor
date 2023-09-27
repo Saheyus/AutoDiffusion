@@ -1,0 +1,65 @@
+﻿@page "/bulkadd"
+@using AutoDiffusion.Models
+@using AutoDiffusion.Services
+@inject INameService NameService
+
+<div class="row">
+    <div class="col-md-4">
+        <h3>Bulk Add Names</h3>
+        <!-- Drop-down for Country/Language -->
+        <select @bind="_selectedCountry">
+            @foreach (var country in _uniqueCountries)
+            {
+                <option value="@country">@country</option>
+            }
+        </select>
+
+        <!-- Drop-down for Type -->
+        <select @bind="_selectedType">
+            @foreach (var type in _uniqueTypes)
+            {
+                <option value="@type">@type</option>
+            }
+        </select>
+
+        <textarea class="form-control" @bind="bulkNames" placeholder="Enter names separated by linebreaks" rows="20"></textarea>
+        <input type="checkbox" @bind="replaceInsteadOfAdd" /> Replace existing names
+        
+        <button class="btn btn-primary" @onclick="BulkProcessNames">Submit</button>
+    </div>
+</div>
+
+@code {
+    private string bulkNames;
+    private string _selectedCountry = string.Empty;
+    private string _selectedType = string.Empty;
+    private bool replaceInsteadOfAdd;
+    private HashSet<string> _uniqueCountries = new HashSet<string>();
+    private HashSet<string> _uniqueTypes = new HashSet<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _uniqueCountries = await NameService.GetUniqueCountriesAsync();
+        _uniqueTypes = await NameService.GetUniqueTypesAsync();
+        _selectedCountry = _uniqueCountries.FirstOrDefault();
+        _selectedType = _uniqueTypes.FirstOrDefault();
+    }
+
+    private async Task BulkProcessNames()
+    {
+        var namesArray = bulkNames.Split('\n'); // Split by linebreaks
+        var nameModels = namesArray.Select(name => new NameModel { Name = name.Trim(), Language = _selectedCountry, Type = _selectedType }).ToList();
+
+        if (replaceInsteadOfAdd)
+        {
+            await NameService.BulkReplaceNamesAsync(nameModels, _selectedCountry, _selectedType);
+        }
+        else
+        {
+            await NameService.BulkAddNamesAsync(nameModels);
+        }
+
+    // Clear the textarea
+        bulkNames = string.Empty;
+    }
+}

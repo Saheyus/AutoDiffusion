@@ -7,25 +7,25 @@ namespace AutoDiffusion.Services;
 
 public class RandomWordService
 {
-    private readonly IConfiguration _DBConfiguration;
+    private readonly IConfiguration _dbConfiguration;
     private readonly Random _random = new();
-    private readonly NextLetterProbabilities nextLetterProbabilities;
-    private List<(string NextLetter, double Probability)>? probabilities;
+    private readonly NextLetterProbabilities _nextLetterProbabilities;
+    private List<(string NextLetter, double Probability)>? _probabilities;
     public List<string> GeneratedWords { get; } = new();
     private readonly ConfigService _configService;
     private readonly INameService _nameService;
 
-    public RandomWordService(IConfiguration DBConfiguration, ConfigService configService, INameService nameService)
+    public RandomWordService(IConfiguration dbConfiguration, ConfigService configService, INameService nameService)
     {
-        _DBConfiguration = DBConfiguration;
-        nextLetterProbabilities = new NextLetterProbabilities();
+        _dbConfiguration = dbConfiguration;
+        _nextLetterProbabilities = new NextLetterProbabilities();
         _configService = configService;
         _nameService = nameService;
     }
 
     public async Task Generate()
     {
-        using var connection = new SqlConnection(_DBConfiguration.GetConnectionString("DefaultConnection"));
+        using var connection = new SqlConnection(_dbConfiguration.GetConnectionString("DefaultConnection"));
         connection.Open();
 
         GeneratedWords.Clear();
@@ -38,7 +38,7 @@ public class RandomWordService
 
             ConfigModel config = await _configService.GetConfig();
 
-            nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
+            _nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
             var popularNames = await _nameService.GetPopularNamesByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
             numberOfWords = 20;
 
@@ -52,7 +52,7 @@ public class RandomWordService
                 do
                 {
                     lastLetters = string.IsNullOrEmpty(randomWord) ? "" : GetLastTwoLetters(randomWord);
-                    probabilities = FindProbabilitiesByLastLetters(lastLetters, randomWord.Length, config);
+                    _probabilities = FindProbabilitiesByLastLetters(lastLetters, randomWord.Length, config);
 
                     int additionalLength = 0;
                     if (randomWord.Contains('-') || randomWord.Contains(' ') || randomWord.Contains('\''))
@@ -61,16 +61,16 @@ public class RandomWordService
                     }
 
                     bool generate = ShouldGenerateAnotherLetter(randomWord, currentLetter, config);
-                    if (generate) probabilities.RemoveAll(x => x.NextLetter == "");
+                    if (generate) _probabilities.RemoveAll(x => x.NextLetter == "");
 
-                    if (probabilities.Count == 0 || randomWord.Length >= config.MaxLetters + additionalLength ||
-                        (probabilities.Count == 1 && probabilities[0].NextLetter == ""))
+                    if (_probabilities.Count == 0 || randomWord.Length >= config.MaxLetters + additionalLength ||
+                        (_probabilities.Count == 1 && _probabilities[0].NextLetter == ""))
                     {
                         randomWord = "";
                     }
                     else
                     {
-                        currentLetter = ReturnLetter(probabilities, randomWord);
+                        currentLetter = ReturnLetter(_probabilities, randomWord);
                         randomWord += currentLetter;
 
                         if (string.IsNullOrEmpty(currentLetter) && !popularNames.Contains(randomWord))
@@ -111,7 +111,7 @@ public class RandomWordService
     {
         List<(string NextLetter, double Probability)> probabilities = new();
 
-        var matchingProbabilities = nextLetterProbabilities.Probabilities
+        var matchingProbabilities = _nextLetterProbabilities.Probabilities
             .Where(p => p.LastLetters == lastLetters)
             .ToList();
 
@@ -177,7 +177,7 @@ public class RandomWordService
 
     public void SaveGeneratedWord(NameModel generatedWord)
     {
-        using var connection = new SqlConnection(_DBConfiguration.GetConnectionString("DefaultConnection"));
+        using var connection = new SqlConnection(_dbConfiguration.GetConnectionString("DefaultConnection"));
         connection.Open();
 
         if (IsWordUnique(connection, generatedWord))

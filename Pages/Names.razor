@@ -42,13 +42,13 @@
         @foreach (var name in _displayNames)
     {
         <tr>
-            <td>@name.ID</td>
+            <td>@name.Id</td>
             <td>@name.Name</td>
             <td>@name.Language</td>
             <td>@name.Type</td>
             <td>
                 <button @onclick="() => EditName(name)">Edit</button>
-                <button @onclick="() => DeleteName(name.ID)">Delete</button>
+                <button @onclick="() => DeleteName(name.Id)">Delete</button>
             </td>
         </tr>
     }
@@ -72,8 +72,8 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadAllData();
-        _selectedCountry = _uniqueCountries.FirstOrDefault();
-        _selectedType = _uniqueTypes.FirstOrDefault(); 
+        _selectedCountry = _uniqueCountries.FirstOrDefault() ?? throw new InvalidOperationException();
+        _selectedType = _uniqueTypes.FirstOrDefault() ?? throw new InvalidOperationException(); 
 
         ApplyCombinedFilter();
     }
@@ -85,42 +85,45 @@
         _uniqueTypes = await NameService.GetUniqueTypesAsync();
     }
 
-    private async Task NextPage()
+    private Task NextPage()
     {
         _currentPage++;
         PaginateFilteredNames();
+        return Task.CompletedTask;
     }
 
-    private async Task PreviousPage()
+    private Task PreviousPage()
     {
         if (_currentPage > 1)
         {
             _currentPage--;
             PaginateFilteredNames();
         }
+        return Task.CompletedTask;
     }
 
     private void ApplyFilter(ChangeEventArgs e)
     {
-        _filterName = e.Value.ToString();
+        if (e.Value != null) _filterName = e.Value.ToString() ?? throw new InvalidOperationException();
         ApplyCombinedFilter();
     }
 
     private void ApplyCountryFilter(ChangeEventArgs e)
     {
-        _selectedCountry = e.Value.ToString();
+        if (e.Value != null) _selectedCountry = e.Value.ToString() ?? throw new InvalidOperationException();
         ApplyCombinedFilter();
     }
 
     private void ApplyTypeFilter(ChangeEventArgs e)
     {
-        _selectedType = e.Value.ToString();
+        if (e.Value != null) _selectedType = e.Value.ToString() ?? throw new InvalidOperationException();
         ApplyCombinedFilter();
     }
 
     private void ApplyCombinedFilter()
     {
         _filteredNames = _allNames.Where(n =>
+            n.Name != null &&
             (string.IsNullOrEmpty(_filterName) || n.Name.Contains(_filterName, StringComparison.OrdinalIgnoreCase)) &&
             (string.IsNullOrEmpty(_selectedCountry) || n.Language == _selectedCountry) &&
             (string.IsNullOrEmpty(_selectedType) || n.Type == _selectedType)
@@ -135,16 +138,18 @@
         StateHasChanged();
     }
 
-    private async Task AddName()
+    private Task AddName()
     {
-        // var newName = new NameModel { Name = "NewName", Language = "France", Type = "Last" };
+        return Task.CompletedTask;
+    // var newName = new NameModel { Name = "NewName", Language = "France", Type = "Last" };
         // await NameService.AddNameAsync(newName);
         // _displayNames.Add(newName);
     }
 
-    private async Task GenerateProbabilities()
+    private Task GenerateProbabilities()
     {
-        ProbabilityService.GenerateProbabilities(_selectedCountry, _selectedType, _filteredNames);
+        ProbabilityService?.GenerateProbabilities(_selectedCountry, _selectedType, _filteredNames);
+        return Task.CompletedTask;
     }
 
     private async Task GenerateAllProbabilities()
@@ -153,15 +158,16 @@
         await ProbabilityService.GenerateAllProbabilities(allNames);
     }
 
-    private async Task EditName(NameModel nameModel)
+    private Task EditName(NameModel nameModel)
     {
-        // nameModel.Name = "EditedName";  // Just an example
+        return Task.CompletedTask;
+    // nameModel.Name = "EditedName";  // Just an example
         // await NameService.UpdateNameAsync(nameModel);
     }
 
     private async Task DeleteName(int id)
     {
         await NameService.DeleteNameAsync(id);
-        _displayNames.RemoveAll(n => n.ID == id);
+        _displayNames.RemoveAll(n => n.Id == id);
     }
 }

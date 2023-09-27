@@ -1,10 +1,10 @@
 ﻿using Grpc.Net.Client;
 
-public class GPTServiceClient
+public class GptServiceClient
 {
     private readonly GPTService.GPTServiceClient _client;
 
-    public GPTServiceClient()
+    public GptServiceClient()
     {
         var channel = GrpcChannel.ForAddress("https://localhost:50051");
         _client = new GPTService.GPTServiceClient(channel);

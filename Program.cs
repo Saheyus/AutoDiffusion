@@ -12,7 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<RefreshService>();
-builder.Services.AddSingleton<GPTServiceClient>();
+builder.Services.AddSingleton<GptServiceClient>();
 builder.Services.AddScoped<RandomWordService>();
 builder.Services.AddSingleton<ConfigService>();
 builder.Services.AddScoped<INameService, NameService>();

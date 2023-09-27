@@ -5,7 +5,7 @@ namespace AutoDiffusion.Models
     [Table("GeneratedWords")]
     public class GeneratedWordModel
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
         [Column("GeneratedWord")]
         public string? Name { get; set; }
         public string? Language { get; set; }

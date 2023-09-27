@@ -5,12 +5,12 @@ namespace AutoDiffusion.Models
     public class ProbabilityModel
     {
         [Key]
-        public int ID { get; set; }
-        public string LastLetters { get; set; }
-        public string NextLetter { get; set; }
+        public int Id { get; set; }
+        public string? LastLetters { get; init; }
+        public string? NextLetter { get; init; }
         public double Probability { get; set; }
-        public string Language { get; set; }
-        public string Type { get; set; }
+        public string? Language { get; init; }
+        public string? Type { get; init; }
     }
 }
 

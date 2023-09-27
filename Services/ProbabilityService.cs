@@ -179,9 +179,9 @@ namespace AutoDiffusion.Services
             LanguageModel generatedLanguage = new();
             generatedLanguage.Language = newLanguageName;
             StringBuilder description = new();
-            foreach (var (Language, Weight) in mixedLanguages)
+            foreach (var (language, weight) in mixedLanguages)
             {
-                description.Append(Language + "_" + Weight + " ");
+                description.Append(language + "_" + weight + " ");
             }
             generatedLanguage.Description = description.ToString();
             _dbContext.Languages.Add(generatedLanguage);

@@ -94,7 +94,7 @@
     <div style="flex: 1;">
         <h3 class="text-white">Saved Words</h3>
         <ul class="list-group list-group-light">
-            @foreach (string word in savedWords)
+            @foreach (string word in _savedWords)
             {
                 <li class="list-group-item fs-4 d-flex justify-content-between align-items-center">
                     <span>@word</span>
@@ -107,7 +107,7 @@
 </div>
 
 @code {
-    private List<string> savedWords = new();
+    private List<string> _savedWords = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -137,13 +137,13 @@
     }
     private async Task UpdateSavedWords()
     {
-        savedWords = await NameService.GetGeneratedWordsByCountryAndCategoryAsync(ConfigService.Config.SelectedLanguage, ConfigService.Config.SelectedCategory);
+        _savedWords = await NameService.GetGeneratedWordsByCountryAndCategoryAsync(ConfigService.Config.SelectedLanguage, ConfigService.Config.SelectedCategory);
         StateHasChanged();
     }
 
     private async Task DeleteName(string word)
     {
-        savedWords.Remove(word);;
+        _savedWords.Remove(word);;
         await NameService.DeleteGeneratedNameAsync(word);
     }
 

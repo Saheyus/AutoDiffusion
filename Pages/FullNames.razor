@@ -13,8 +13,8 @@
             <div class="form-group row">
                 <label for="languageSelect" class="col-form-label col-sm-1 text-light">Langue:</label>
                 <div class="col-sm-4">
-                    <select id="languageSelect" @bind="selectedLanguage" class="form-control">
-                        @foreach (var lang in languages)
+                    <select id="languageSelect" @bind="_selectedLanguage" class="form-control">
+                        @foreach (var lang in _languages)
                         {
                             <option value="@lang.Language">@lang.Language</option>
                         }
@@ -34,8 +34,8 @@
             <div class="form-group row">
                 <label for="secondChance" class="col-sm-3 col-form-label text-light">Chance de second prénom:</label>
                 <div class="col-sm-6">
-                    <input type="range" id="secondChance" min="0" max="100" step="10" @bind="chanceForSecondFirstName" class="form-control-range" />
-                    <span class="text-light">@chanceForSecondFirstName %</span>
+                    <input type="range" id="secondChance" min="0" max="100" step="10" @bind="_chanceForSecondFirstName" class="form-control-range" />
+                    <span class="text-light">@_chanceForSecondFirstName %</span>
                 </div>
             </div>
         </form>
@@ -66,7 +66,7 @@
                 {
                     <li class="list-group-item fs-4 d-flex justify-content-between align-items-center">
                         <div>@name?.FullName</div>
-                        <button @onclick="() => DeleteName(name.ID)" type="button" class="btn btn-dark btn-floating" data-mdb-ripple-color="dark"><i class="fas fa-trash"></i></button>
+                        <button @onclick="() => DeleteName(name.Id)" type="button" class="btn btn-dark btn-floating" data-mdb-ripple-color="dark"><i class="fas fa-trash"></i></button>
                     </li>
                 }
             }
@@ -77,17 +77,17 @@
 @code {
     private List<FullNameModel>? _savedFullNames = new();
     private List<FullNameModel>? _generatedFullNames = new();
-    private List<LanguageModel> languages = new List<LanguageModel>();
-    private string selectedGender = "Male";
-    private string selectedLanguage = "English";
-    private int chanceForSecondFirstName = 0;
+    private List<LanguageModel> _languages = new List<LanguageModel>();
+    private string _selectedGender = "Male";
+    private string _selectedLanguage = "English";
+    private int _chanceForSecondFirstName = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        languages = await LanguageService.GetLanguagesWithGeneratedWordsAsync();
-        if (languages.Any())
+        _languages = await LanguageService.GetLanguagesWithGeneratedWordsAsync();
+        if (_languages.Any())
         {
-            selectedLanguage = languages[0].Language;
+            _selectedLanguage = _languages[0].Language;
         }
         await ConfigService.LoadConfiguration();
         await UpdateSavedFullNames();
@@ -95,11 +95,11 @@
 
     private async void GenerateRandomNames()
     {
-        var fullNames = await FullNameService.GenerateFullNameAsync(selectedLanguage, selectedGender, chanceForSecondFirstName, 18);
+        var fullNames = await FullNameService.GenerateFullNameAsync(_selectedLanguage, _selectedGender, _chanceForSecondFirstName, 18);
         _generatedFullNames.Clear();
         foreach (var name in fullNames)
         {
-            _generatedFullNames.Add(new FullNameModel { FullName = name, Gender = selectedGender });
+            _generatedFullNames.Add(new FullNameModel { FullName = name, Gender = _selectedGender });
         }
         StateHasChanged(); 
     }
@@ -114,7 +114,7 @@
     {
         try
         {
-            _savedFullNames = await FullNameService.GetAsync(selectedGender);
+            _savedFullNames = await FullNameService.GetAsync(_selectedGender);
             StateHasChanged();
         }
         catch (Exception ex)
@@ -132,13 +132,13 @@
 
     private void OnGenderSelection(ChangeEventArgs e)
     {
-        selectedGender = e.Value.ToString();
+        _selectedGender = e.Value.ToString();
         _savedFullNames.Clear();
     }
 
     private void OnLanguageSelection(ChangeEventArgs e)
     {
-        selectedLanguage = e.Value.ToString();
+        _selectedLanguage = e.Value.ToString();
     }
 }
 

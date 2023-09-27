@@ -5,12 +5,12 @@ namespace AutoDiffusion.Services
 {
     public class ConfigService
     {
-        private readonly IConfiguration _DBConfiguration;
+        private readonly IConfiguration _dbConfiguration;
         public ConfigModel Config { get; set; }
 
         public ConfigService(IConfiguration configuration)
         {
-            _DBConfiguration = configuration;
+            _dbConfiguration = configuration;
             Config = new ConfigModel();
         }
 
@@ -31,7 +31,7 @@ namespace AutoDiffusion.Services
         {
             try
             {
-                using var connection = new SqlConnection(_DBConfiguration.GetConnectionString("DefaultConnection"));
+                using var connection = new SqlConnection(_dbConfiguration.GetConnectionString("DefaultConnection"));
                 await connection.OpenAsync();
 
                 string query = "SELECT * FROM WordParameters WHERE Language = @SelectedLanguage AND Categorie = @SelectedCategory";
@@ -70,7 +70,7 @@ namespace AutoDiffusion.Services
         {
             string query = $"SELECT DISTINCT {columnName} FROM WordParameters";
 
-            await using var connection = new SqlConnection(_DBConfiguration.GetConnectionString("DefaultConnection"));
+            await using var connection = new SqlConnection(_dbConfiguration.GetConnectionString("DefaultConnection"));
             connection.Open();
             await using (SqlCommand command = new SqlCommand(query, connection))
             await using (SqlDataReader reader = await command.ExecuteReaderAsync())

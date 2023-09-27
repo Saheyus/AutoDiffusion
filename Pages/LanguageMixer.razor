@@ -3,14 +3,14 @@
 @using AutoDiffusion.Models;
 @using System.Globalization;
 @inject ConfigService ConfigService
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 @inject ProbabilityService ProbabilityService
 
 <h3 class="text-white">Language Mixer</h3>
 
 <div>
     <button @onclick="AddLanguage" class="btn btn-primary mb-3">Add Language</button>
-    @foreach (var lang in selectedLanguages.Select((value, index) => (value, index)))
+    @foreach (var lang in _selectedLanguages.Select((value, index) => (value, index)))
     {
         <div class="row align-items-center mb-2">
             <!-- Language dropdown -->
@@ -42,25 +42,25 @@
             </div>
         </div>
     }
-    <div><input type="text" @bind="newLanguageName" placeholder="New Language Name" /></div>
-    <div><button @onclick="SaveMixedLanguage" class="btn btn-success mb-3 mt-2" disabled="@string.IsNullOrEmpty(newLanguageName)">Save</button></div>
+    <div><input type="text" @bind="_newLanguageName" placeholder="New Language Name" /></div>
+    <div><button @onclick="SaveMixedLanguage" class="btn btn-success mb-3 mt-2" disabled="@string.IsNullOrEmpty(_newLanguageName)">Save</button></div>
     <div class="row">
         <div class="col-12 col-md-3">
-            @if (!string.IsNullOrEmpty(feedbackMessage))
+            @if (!string.IsNullOrEmpty(_feedbackMessage))
             {
-                <div class="alert @alertClass" role="alert">
-                    @feedbackMessage
+                <div class="alert @_alertClass" role="alert">
+                    @_feedbackMessage
                 </div>
             }
             <div class="form-group">
                 <label for="wordInput" class="text-white">Words to Check (comma-separated):</label>
-                <input type="text" class="form-control" id="wordInput" @bind="wordsToCheck" />
+                <input type="text" class="form-control" id="wordInput" @bind="_wordsToCheck" />
             </div>
             <button class="btn btn-primary" @onclick="CheckLanguages">Check</button>
 
-            @if (combinedMatchingLanguages != null)
+            @if (_combinedMatchingLanguages != null)
             {
-                if (combinedMatchingLanguages.Count > 0)
+                if (_combinedMatchingLanguages.Count > 0)
                 {
                     <table class="table text-white">
                         <thead>
@@ -70,7 +70,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                            @foreach (var match in combinedMatchingLanguages)
+                            @foreach (var match in _combinedMatchingLanguages)
                         {
                             <tr>
                                 <td>@match.Key</td>
@@ -92,47 +92,47 @@
 
 
 @code {
-    private List<string> availableLanguages;
-    private List<LanguageWeight> selectedLanguages = new();
-    private string newLanguageName;
-    string feedbackMessage = "";
-    string alertClass = "alert-danger";
-    private string wordsToCheck;
-    private Dictionary<string, (int MatchingScore, string Description)> combinedMatchingLanguages;
+    private List<string> _availableLanguages;
+    private List<LanguageWeight> _selectedLanguages = new();
+    private string _newLanguageName;
+    string _feedbackMessage = "";
+    string _alertClass = "alert-danger";
+    private string _wordsToCheck;
+    private Dictionary<string, (int MatchingScore, string Description)> _combinedMatchingLanguages;
 
     protected override async Task OnInitializedAsync()
     {
     // Load the configuration and supported languages
         await ConfigService.LoadCategories();
-        availableLanguages = ConfigService.Config.SupportedLanguages.ToList();
+        _availableLanguages = ConfigService.Config.SupportedLanguages.ToList();
 
     // Initialize with two languages if the list is empty
-        if (selectedLanguages.Count == 0)
+        if (_selectedLanguages.Count == 0)
         {
-            selectedLanguages.Add(new LanguageWeight { Language = availableLanguages[0], Weight = 0.5 });
-            selectedLanguages.Add(new LanguageWeight { Language = availableLanguages[1], Weight = 0.5 });
+            _selectedLanguages.Add(new LanguageWeight { Language = _availableLanguages[0], Weight = 0.5 });
+            _selectedLanguages.Add(new LanguageWeight { Language = _availableLanguages[1], Weight = 0.5 });
         }
     }
 
     private IEnumerable<string> GetAvailableLanguagesForIndex(int index)
     {
-        return availableLanguages.Except(selectedLanguages.Where((value, i) => i != index).Select(x => x.Language));
+        return _availableLanguages.Except(_selectedLanguages.Where((value, i) => i != index).Select(x => x.Language));
     }
 
     private void UpdateLanguage(int index, ChangeEventArgs e)
     {
-        selectedLanguages[index].Language = e.Value.ToString();
+        _selectedLanguages[index].Language = e.Value.ToString();
     }
 
 
     private void AddLanguage()
     {
-        if (selectedLanguages.Count < 3)
+        if (_selectedLanguages.Count < 3)
         {
-            var firstAvailableLanguage = availableLanguages.Except(selectedLanguages.Select(x => x.Language)).FirstOrDefault();
+            var firstAvailableLanguage = _availableLanguages.Except(_selectedLanguages.Select(x => x.Language)).FirstOrDefault();
             if (firstAvailableLanguage != null)
             {
-                selectedLanguages.Add(new LanguageWeight { Language = firstAvailableLanguage, Weight = 1.0 / (selectedLanguages.Count + 1) });
+                _selectedLanguages.Add(new LanguageWeight { Language = firstAvailableLanguage, Weight = 1.0 / (_selectedLanguages.Count + 1) });
                 NormalizeWeights();
             }
         }
@@ -140,29 +140,29 @@
 
     private void SaveMixedLanguage()
     {
-        if (!string.IsNullOrEmpty(newLanguageName))
+        if (!string.IsNullOrEmpty(_newLanguageName))
         {
             List<(string Language, double Weight)> mixedLanguages = new List<(string Language, double Weight)>();
-            foreach (var lang in selectedLanguages)
+            foreach (var lang in _selectedLanguages)
             {
                 mixedLanguages.Add((lang.Language, lang.Weight));
             }
 
-            ProbabilityService.MixLanguageProbabilities(mixedLanguages, newLanguageName);
-            feedbackMessage = "Language successfully mixed!";
-            alertClass = "alert-success";
+            ProbabilityService.MixLanguageProbabilities(mixedLanguages, _newLanguageName);
+            _feedbackMessage = "Language successfully mixed!";
+            _alertClass = "alert-success";
         }
         else
         {
-            feedbackMessage = "Error: New language name cannot be empty.";
+            _feedbackMessage = "Error: New language name cannot be empty.";
         }
     }
 
     private void RemoveLanguage(int index)
     {
-        if (selectedLanguages.Count > 2)
+        if (_selectedLanguages.Count > 2)
         {
-            selectedLanguages.RemoveAt(index);
+            _selectedLanguages.RemoveAt(index);
             NormalizeWeights();
         }
     }
@@ -171,16 +171,16 @@
     {
         if (double.TryParse(e.Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double newWeight))
         {
-            selectedLanguages[changedIndex].Weight = newWeight;
+            _selectedLanguages[changedIndex].Weight = newWeight;
 
             double remainingWeight = 1 - newWeight;
-            int remainingItems = selectedLanguages.Count - 1;
+            int remainingItems = _selectedLanguages.Count - 1;
 
-            for (int i = 0; i < selectedLanguages.Count; i++)
+            for (int i = 0; i < _selectedLanguages.Count; i++)
             {
                 if (i != changedIndex)
                 {
-                    selectedLanguages[i].Weight = remainingWeight / remainingItems;
+                    _selectedLanguages[i].Weight = remainingWeight / remainingItems;
                 }
             }
 
@@ -188,17 +188,17 @@
         }
 
     // After updating the weights, manually set the slider value using JS interop
-        for (int i = 0; i < selectedLanguages.Count; i++)
+        for (int i = 0; i < _selectedLanguages.Count; i++)
         {
-            await JSRuntime.InvokeVoidAsync("updateSliderValue", $"slider-{i}", selectedLanguages[i].Weight);
+            await JsRuntime.InvokeVoidAsync("updateSliderValue", $"slider-{i}", _selectedLanguages[i].Weight);
         }
     }
 
-    private async Task CheckLanguages()
+    private Task CheckLanguages()
     {
-        var words = wordsToCheck.Split(',').Select(w => w.Trim());
-        combinedMatchingLanguages ??= new Dictionary<string, (int MatchingScore, string Description)>();
-        combinedMatchingLanguages.Clear();
+        var words = _wordsToCheck.Split(',').Select(w => w.Trim());
+        _combinedMatchingLanguages ??= new Dictionary<string, (int MatchingScore, string Description)>();
+        _combinedMatchingLanguages.Clear();
 
     
         foreach (var word in words)
@@ -207,22 +207,23 @@
             CombineScores(matchingLanguages);
         }
 
-        combinedMatchingLanguages = combinedMatchingLanguages.OrderBy(x => x.Value.MatchingScore).ToDictionary(x => x.Key, x => x.Value);
+        _combinedMatchingLanguages = _combinedMatchingLanguages.OrderBy(x => x.Value.MatchingScore).ToDictionary(x => x.Key, x => x.Value);
+        return Task.CompletedTask;
     }
 
     private void CombineScores(Dictionary<string, (int MatchingScore, string Description)> matchingLanguages)
     {
         foreach (var match in matchingLanguages)
         {
-            if (!combinedMatchingLanguages.ContainsKey(match.Key))
+            if (!_combinedMatchingLanguages.ContainsKey(match.Key))
             {
-                combinedMatchingLanguages[match.Key] = match.Value;
+                _combinedMatchingLanguages[match.Key] = match.Value;
             }
             else
             {
-                var existing = combinedMatchingLanguages[match.Key];
+                var existing = _combinedMatchingLanguages[match.Key];
                 var newScore = existing.MatchingScore + match.Value.MatchingScore;
-                combinedMatchingLanguages[match.Key] = (newScore, existing.Description);
+                _combinedMatchingLanguages[match.Key] = (newScore, existing.Description);
             }
         }
     }
@@ -230,8 +231,8 @@
     private void NormalizeWeights()
     {
 
-        double equalWeight = 1.0 / selectedLanguages.Count;
-        foreach (var lang in selectedLanguages)
+        double equalWeight = 1.0 / _selectedLanguages.Count;
+        foreach (var lang in _selectedLanguages)
         {
             lang.Weight = equalWeight;
         }

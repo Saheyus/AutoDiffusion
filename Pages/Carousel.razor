@@ -48,15 +48,15 @@
 
 @code {
     [Parameter]
-    public string folder { get; set; }
+    public string Folder { get; set; }
 
     public class CarouselItem
     {
-        public string? ImageUrl { get; set; }
-        public string? Text { get; set; }
-        public string? FullText { get; set; }
-        public string? Prompt { get; set; }
-        public int Order { get; set; }
+        public string? ImageUrl { get; init; }
+        public string? Text { get; init; }
+        public string? FullText { get; init; }
+        public string? Prompt { get; init; }
+        public int Order { get; init; }
     }
 
     public List<CarouselItem> Data { get; set; } = new List<CarouselItem>();
@@ -71,9 +71,9 @@
     {
         var uri = new Uri(NavigationManager.Uri);
         var queryParameters = QueryHelpers.ParseQuery(uri.Query);
-        folder = queryParameters.TryGetValue("folder", out var folderValue) ? folderValue.ToString() : null;
+        Folder = queryParameters.TryGetValue("folder", out var folderValue) ? folderValue.ToString() : null;
 
-        var imageDirectory = Path.Combine(Env.ContentRootPath, "wwwroot", "galleries", folder);
+        var imageDirectory = Path.Combine(Env.ContentRootPath, "wwwroot", "galleries", Folder);
         var files = Directory.EnumerateFiles(imageDirectory, "*.png");
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -91,7 +91,7 @@
                 // Utilisation de la fonction ExtractWords :
                 var text = ExtractWords(fullText, 12);
 
-                var imageUrl = Path.Combine("galleries", folder, Path.GetFileName(file));
+                var imageUrl = Path.Combine("galleries", Folder, Path.GetFileName(file));
                 string prompt = "";
                 foreach (var promptFile in promptFiles)
                 {

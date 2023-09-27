@@ -5,9 +5,9 @@ namespace AutoDiffusion.Services
 {
     public class NextLetterProbability
     {
-        public string LastLetters { get; set; }
-        public string NextLetter { get; set; }
-        public double Probability { get; set; }
+        public string? LastLetters { get; init; }
+        public string? NextLetter { get; init; }
+        public double Probability { get; init; }
     }
 
     public class NextLetterProbabilities

@@ -66,11 +66,11 @@ namespace Autodiffusion.Services
             return fullNames;
         }
 
-        private async Task<string> GenerateNameAsync(string Language, string gender)
+        private async Task<string> GenerateNameAsync(string language, string gender)
         {
             // Query the database for names of the given gender and type
             var names = await _context.GeneratedWords
-                .Where(x => x.Type.Equals(gender) && x.Language.Equals(Language))
+                .Where(x => x.Type.Equals(gender) && x.Language.Equals(language))
                 .ToListAsync();
 
             if (names.Count == 0)
