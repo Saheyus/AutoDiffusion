@@ -25,67 +25,69 @@ public class RandomWordService
 
     public async Task Generate()
     {
-        using var connection = new SqlConnection(_dbConfiguration.GetConnectionString("DefaultConnection"));
-        connection.Open();
+        await using var connection = new SqlConnection(_dbConfiguration.GetConnectionString("DefaultConnection"));
+        await connection.OpenAsync();
 
         GeneratedWords.Clear();
 
-        using (connection)
+        string currentLetter = "", randomWord = "", lastLetters = " ";
+        int numberOfWords = 20; // Initialize as per your requirement
+
+        ConfigModel config = await _configService.GetConfig();
+
+        _nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
+        var popularNames = await _nameService.GetPopularNamesByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
+
+        for (var i = 0; i < numberOfWords; i++)
         {
+            randomWord = "";
+            currentLetter = "";
 
-            string currentLetter = "", randomWord = "", lastLetters = " ";
-            var numberOfWords = 0;
+            bool continueLoop = true;
 
-            ConfigModel config = await _configService.GetConfig();
-
-            _nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
-            var popularNames = await _nameService.GetPopularNamesByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
-            numberOfWords = 20;
-
-            for (var i = 0; i < numberOfWords; i++)
+            do
             {
-                randomWord = "";
-                currentLetter = "";
+                lastLetters = string.IsNullOrEmpty(randomWord) ? "" : GetLastTwoLetters(randomWord);
+                _probabilities = FindProbabilitiesByLastLetters(lastLetters, randomWord.Length, config);
 
-                bool continueLoop = true;
-
-                do
+                int additionalLength = 0;
+                if (randomWord.Contains('-') || randomWord.Contains(' ') || randomWord.Contains('\''))
                 {
-                    lastLetters = string.IsNullOrEmpty(randomWord) ? "" : GetLastTwoLetters(randomWord);
-                    _probabilities = FindProbabilitiesByLastLetters(lastLetters, randomWord.Length, config);
+                    additionalLength = 3;
+                }
 
-                    int additionalLength = 0;
-                    if (randomWord.Contains('-') || randomWord.Contains(' ') || randomWord.Contains('\''))
+                bool generate = ShouldGenerateAnotherLetter(randomWord, currentLetter, config);
+                if (generate) _probabilities.RemoveAll(x => x.NextLetter == "");
+
+                if (_probabilities.Count == 0 || randomWord.Length >= config.MaxLetters + additionalLength ||
+                    (_probabilities.Count == 1 && _probabilities[0].NextLetter == ""))
+                {
+                    randomWord = "";
+                }
+                else
+                {
+                    currentLetter = ReturnLetter(_probabilities, randomWord);
+                    randomWord += currentLetter;
+
+                    if (string.IsNullOrEmpty(currentLetter) && !popularNames.Contains(randomWord))
                     {
-                        additionalLength = 3;
-                    }
-
-                    bool generate = ShouldGenerateAnotherLetter(randomWord, currentLetter, config);
-                    if (generate) _probabilities.RemoveAll(x => x.NextLetter == "");
-
-                    if (_probabilities.Count == 0 || randomWord.Length >= config.MaxLetters + additionalLength ||
-                        (_probabilities.Count == 1 && _probabilities[0].NextLetter == ""))
-                    {
-                        randomWord = "";
-                    }
-                    else
-                    {
-                        currentLetter = ReturnLetter(_probabilities, randomWord);
-                        randomWord += currentLetter;
-
-                        if (string.IsNullOrEmpty(currentLetter) && !popularNames.Contains(randomWord))
+                        if (!GeneratedWords.Contains(randomWord))  // Check if randomWord already exists in the list
                         {
-                            continueLoop = false;  // Stop the loop
+                            randomWord = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(randomWord.ToLower());
+                            GeneratedWords.Add(randomWord);
+                            break;  // Exit the do-while loop
+                        }
+                        else
+                        {
+                            randomWord = "";  // Reset the randomWord and continue looping
                         }
                     }
+                }
 
-                } while (continueLoop);
-
-                randomWord = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(randomWord.ToLower());
-                GeneratedWords.Add(randomWord);
-            }
+            } while (continueLoop);
         }
     }
+
 
     private string ReturnLetter(List<(string NextLetter, double Probability)> probabilities, string randomWord)
     {

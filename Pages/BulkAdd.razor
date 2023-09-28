@@ -22,18 +22,18 @@
             }
         </select>
 
-        <textarea class="form-control" @bind="bulkNames" placeholder="Enter names separated by linebreaks" rows="20"></textarea>
-        <input type="checkbox" @bind="replaceInsteadOfAdd" /> Replace existing names
+        <textarea class="form-control" @bind="_bulkNames" placeholder="Enter names separated by linebreaks" rows="20"></textarea>
+        <input type="checkbox" @bind="_replaceInsteadOfAdd" /> Replace existing names
         
         <button class="btn btn-primary" @onclick="BulkProcessNames">Submit</button>
     </div>
 </div>
 
 @code {
-    private string bulkNames;
+    private string _bulkNames;
     private string _selectedCountry = string.Empty;
     private string _selectedType = string.Empty;
-    private bool replaceInsteadOfAdd;
+    private bool _replaceInsteadOfAdd;
     private HashSet<string> _uniqueCountries = new HashSet<string>();
     private HashSet<string> _uniqueTypes = new HashSet<string>();
 
@@ -47,10 +47,10 @@
 
     private async Task BulkProcessNames()
     {
-        var namesArray = bulkNames.Split('\n'); // Split by linebreaks
+        var namesArray = _bulkNames.Split('\n'); // Split by linebreaks
         var nameModels = namesArray.Select(name => new NameModel { Name = name.Trim(), Language = _selectedCountry, Type = _selectedType }).ToList();
 
-        if (replaceInsteadOfAdd)
+        if (_replaceInsteadOfAdd)
         {
             await NameService.BulkReplaceNamesAsync(nameModels, _selectedCountry, _selectedType);
         }
@@ -60,6 +60,6 @@
         }
 
     // Clear the textarea
-        bulkNames = string.Empty;
+        _bulkNames = string.Empty;
     }
 }

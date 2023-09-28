@@ -22,6 +22,7 @@ namespace Autodiffusion.Services
         {
             return await _context.Languages
                 .Where(lang => _context.GeneratedWords.Any(gw => gw.Language == lang.Language))
+                .OrderBy(lang => lang.Language)
                 .ToListAsync();
         }
 
