@@ -1,14 +1,16 @@
 ﻿@page "/bulkadd"
 @using AutoDiffusion.Models
+@using Autodiffusion.Services
 @using AutoDiffusion.Services
 @inject INameService NameService
+@inject LanguageService LanguageService
 
 <div class="row">
     <div class="col-md-4">
         <h3>Bulk Add Names</h3>
         <!-- Drop-down for Country/Language -->
         <select @bind="_selectedCountry">
-            @foreach (var country in _uniqueCountries)
+            @foreach (var country in _uniqueLanguages)
             {
                 <option value="@country">@country</option>
             }
@@ -34,14 +36,15 @@
     private string _selectedCountry = string.Empty;
     private string _selectedType = string.Empty;
     private bool _replaceInsteadOfAdd;
-    private HashSet<string> _uniqueCountries = new HashSet<string>();
-    private HashSet<string> _uniqueTypes = new HashSet<string>();
+    private HashSet<string> _uniqueLanguages = new();
+    private HashSet<string> _uniqueTypes = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _uniqueCountries = await NameService.GetUniqueCountriesAsync();
+        var languageModels = await LanguageService.GetLanguagesAsync();
+        _uniqueLanguages = new HashSet<string>(languageModels.Select(lang => lang.Language));
         _uniqueTypes = await NameService.GetUniqueTypesAsync();
-        _selectedCountry = _uniqueCountries.FirstOrDefault();
+        _selectedCountry = _uniqueLanguages.FirstOrDefault();
         _selectedType = _uniqueTypes.FirstOrDefault();
     }
 

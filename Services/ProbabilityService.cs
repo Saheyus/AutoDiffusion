@@ -39,7 +39,7 @@ namespace AutoDiffusion.Services
 
             foreach (var name in normalizedNames)
             {
-                Console.WriteLine($"Processing name: {name}");
+                //Console.WriteLine($"Processing name: {name}");
                 // Case for the first letter of the word
                 string separator = "|";
                 string key = "";
@@ -96,19 +96,20 @@ namespace AutoDiffusion.Services
 
         private async Task SaveProbabilities(Dictionary<string, double> probMap, string language, string nameType)
         {
-
             // Clear existing probabilities from the database
-            _dbContext.Probabilities.RemoveRange(_dbContext.Probabilities.Where(p => p.Language == language && p.Type == nameType));
+            var existingEntries = _dbContext.Probabilities
+                .Where(p => p.Language == language && p.Type == nameType)
+                .ToList();
+
+            _dbContext.Probabilities.RemoveRange(existingEntries);
             await _dbContext.SaveChangesAsync();
 
-            // Save the new probabilities
-            foreach (var entry in probMap)
-            {
+            // Prepare new probabilities
+            var newProbabilities = probMap.Select(entry => {
                 var parts = entry.Key.Split('|');
                 string lastLetters = parts[0];
                 string nextLetter = parts.Length > 1 ? parts[1] : "";
-
-                var tempContext = new ProbabilityModel
+                return new ProbabilityModel
                 {
                     LastLetters = lastLetters,
                     NextLetter = nextLetter,
@@ -116,8 +117,10 @@ namespace AutoDiffusion.Services
                     Language = language,
                     Type = nameType
                 };
-                _dbContext.Probabilities.Add(tempContext);
-            }
+            }).ToList();
+
+            // Save new probabilities
+            _dbContext.Probabilities.AddRange(newProbabilities);
 
             await _dbContext.SaveChangesAsync();
             Console.WriteLine("Database updated");
@@ -296,7 +299,7 @@ namespace AutoDiffusion.Services
             _dbContext.SaveChanges();
         }
 
-        public Dictionary<string, (int MatchingScore, string Description)> CheckWordAgainstLanguages(string word)
+        public Dictionary<string, (int MatchingScore, string ClosestWord, string Description)> CheckWordAgainstLanguages(string word)
         {
             int threshold = 6;
 
@@ -323,12 +326,12 @@ namespace AutoDiffusion.Services
             var unsortedResults = CheckLanguage(word, languageWords, threshold);
 
             // Create the result dictionary
-            Dictionary<string, (int MatchingScore, string Description)> results = new Dictionary<string, (int, string)>();
+            Dictionary<string, (int MatchingScore, string ClosestWord, string Description)> results = new Dictionary<string, (int, string, string)>();
 
             foreach (var kvp in unsortedResults)
             {
                 string description = languageDescriptions.ContainsKey(kvp.Key) ? languageDescriptions[kvp.Key] : "Unknown";
-                results[kvp.Key] = (kvp.Value, description);
+                results[kvp.Key] = (kvp.Value.MatchingScore, kvp.Value.ClosestWord, description);
             }
 
             // Sort the dictionary by MatchingScore
@@ -365,25 +368,28 @@ namespace AutoDiffusion.Services
         }
 
         // Method to Check Language based on similarity
-        public Dictionary<string, int> CheckLanguage(string word, Dictionary<string, List<string>> languageWords, int threshold)
+        public Dictionary<string, (int MatchingScore, string ClosestWord)> CheckLanguage(string word, Dictionary<string, List<string>> languageWords, int threshold)
         {
-            Dictionary<string, int> matchingLanguages = new Dictionary<string, int>();
+            Dictionary<string, (int MatchingScore, string ClosestWord)> matchingLanguages = new Dictionary<string, (int, string)>();
 
             foreach (var language in languageWords.Keys)
             {
                 int minDistance = int.MaxValue;
+                string closestWord = null;
+
                 foreach (var languageWord in languageWords[language])
                 {
                     int distance = LevenshteinDistance(word.ToLower(), languageWord.ToLower());
                     if (distance <= threshold && distance < minDistance)
                     {
                         minDistance = distance;
+                        closestWord = languageWord;
                     }
                 }
 
                 if (minDistance != int.MaxValue)
                 {
-                    matchingLanguages[language] = minDistance;
+                    matchingLanguages[language] = (minDistance, closestWord);
                 }
             }
             return matchingLanguages;

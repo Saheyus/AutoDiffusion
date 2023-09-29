@@ -14,7 +14,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<RefreshService>();
 builder.Services.AddSingleton<GptServiceClient>();
 builder.Services.AddScoped<RandomWordService>();
-builder.Services.AddSingleton<ConfigService>();
+builder.Services.AddScoped<ConfigService>();
 builder.Services.AddScoped<INameService, NameService>();
 builder.Services.AddScoped<ProbabilityService>();
 builder.Services.AddScoped<FullNameService>();

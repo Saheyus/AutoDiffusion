@@ -10,7 +10,6 @@ namespace AutoDiffusion.Services
     {
         Task<List<NameModel>> GetAllNamesAsync();
         Task<List<string>> GetNamesByCountryAndCategoryAsync(string country, string category);
-        Task<List<string>> GetPopularNamesByCountryAndCategoryAsync(string country, string category);
         Task<NameModel> GetNameByIdAsync(int id);
         Task AddNameAsync(NameModel nameModel);
         Task UpdateNameAsync(NameModel nameModel);
@@ -49,16 +48,6 @@ namespace AutoDiffusion.Services
             return await _dbContext.GeneratedWords
                 .Where(g => g.Language == country && g.Type == category)
                 .Select(g => g.Name)
-                .ToListAsync();
-        }
-
-
-        public async Task<List<string>> GetPopularNamesByCountryAndCategoryAsync(string country, string category)
-        {
-            return await _dbContext.Names
-                .Where(n => n.Language == country && n.Type == category)
-                .Take(100)
-                .Select(n => n.Name)  // Replace 'Name' with the actual property that contains the name string
                 .ToListAsync();
         }
 
@@ -137,24 +126,20 @@ namespace AutoDiffusion.Services
 
         public async Task BulkAddNamesAsync(List<NameModel> nameModels)
         {
-            try
-            {
-                await _dbContext.AddRangeAsync(nameModels);
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
-            {
-                // Handle unique constraint violation
-                // Identify duplicates and retry without them
-                var existingNames = _dbContext.Names.Select(n => new { n.Name, n.Language, n.Type }).ToList();
+            string? targetLanguage = nameModels[0].Language;
+            string? targetType = nameModels[0].Type;
 
-                var nonDuplicateNames = nameModels
-                    .Where(nm => !existingNames.Any(en => en.Name == nm.Name && en.Language == nm.Language && en.Type == nm.Type))
-                    .ToList();
+            var existingNames = await _dbContext.Names
+                .Where(n => n.Language == targetLanguage && n.Type == targetType)
+                .Select(n => n.Name)
+                .ToListAsync();
 
-                await _dbContext.AddRangeAsync(nonDuplicateNames);
-                await _dbContext.SaveChangesAsync();
-            }
+            var nonDuplicateNames = nameModels
+                .Where(nm => !existingNames.Contains(nm.Name))
+                .ToList();
+
+            await _dbContext.AddRangeAsync(nonDuplicateNames);
+            await _dbContext.SaveChangesAsync();
         }
 
     }

@@ -45,7 +45,7 @@
     <div><input type="text" @bind="_newLanguageName" placeholder="New Language Name" /></div>
     <div><button @onclick="SaveMixedLanguage" class="btn btn-success mb-3 mt-2" disabled="@string.IsNullOrEmpty(_newLanguageName)">Save</button></div>
     <div class="row">
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-6">
             @if (!string.IsNullOrEmpty(_feedbackMessage))
             {
                 <div class="alert @_alertClass" role="alert">
@@ -67,23 +67,35 @@
                         <tr>
                             <th>Language</th>
                             <th>Combined Distance Score</th>
+                            <th>Closest Words for Checked Words</th>
                         </tr>
                         </thead>
                         <tbody>
-                            @foreach (var match in _combinedMatchingLanguages)
+                        @foreach (var match in _combinedMatchingLanguages)
                         {
                             <tr>
                                 <td>@match.Key</td>
                                 <td>@match.Value.MatchingScore</td>
+                                <td>
+                                    <ul>
+                                        @foreach (var word in _closestWordsForEachLanguage.Keys)
+                                        {
+                                            if (_closestWordsForEachLanguage[word].ContainsKey(match.Key))
+                                            {
+                                                <li>@word: @_closestWordsForEachLanguage[word][match.Key]</li>
+                                            }
+                                        }
+                                    </ul>
+                                </td>
                             </tr>
                         }
                         </tbody>
                     </table>
                 }
-                else
-                {
-                    <p class="text-white">No result</p>
-                }
+            }
+            else
+            {
+                <p class="text-white">No result</p>
             }
         </div>
     </div>
@@ -98,7 +110,9 @@
     string _feedbackMessage = "";
     string _alertClass = "alert-danger";
     private string _wordsToCheck;
-    private Dictionary<string, (int MatchingScore, string Description)> _combinedMatchingLanguages;
+    Dictionary<string, (int MatchingScore, string ClosestWord, string Description)> _combinedMatchingLanguages = new();
+    Dictionary<string, Dictionary<string, string>> _closestWordsForEachLanguage = new();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -197,36 +211,39 @@
     private Task CheckLanguages()
     {
         var words = _wordsToCheck.Split(',').Select(w => w.Trim());
-        _combinedMatchingLanguages ??= new Dictionary<string, (int MatchingScore, string Description)>();
         _combinedMatchingLanguages.Clear();
+        _closestWordsForEachLanguage.Clear();
 
-    
         foreach (var word in words)
         {
             var matchingLanguages = ProbabilityService.CheckWordAgainstLanguages(word);
-            CombineScores(matchingLanguages);
+        
+            foreach (var lang in matchingLanguages)
+            {
+                if (_combinedMatchingLanguages.ContainsKey(lang.Key))
+                {
+                    var existing = _combinedMatchingLanguages[lang.Key];
+                    var newScore = existing.MatchingScore + lang.Value.MatchingScore;
+                    _combinedMatchingLanguages[lang.Key] = (newScore, existing.ClosestWord, existing.Description);
+                }
+                else
+                {
+                    _combinedMatchingLanguages[lang.Key] = (lang.Value.MatchingScore, lang.Value.ClosestWord, lang.Value.Description);
+                }
+
+                if (!_closestWordsForEachLanguage.ContainsKey(word))
+                {
+                    _closestWordsForEachLanguage[word] = new Dictionary<string, string>();
+                }
+                _closestWordsForEachLanguage[word][lang.Key] = lang.Value.ClosestWord;
+            }
         }
 
         _combinedMatchingLanguages = _combinedMatchingLanguages.OrderBy(x => x.Value.MatchingScore).ToDictionary(x => x.Key, x => x.Value);
+
         return Task.CompletedTask;
     }
 
-    private void CombineScores(Dictionary<string, (int MatchingScore, string Description)> matchingLanguages)
-    {
-        foreach (var match in matchingLanguages)
-        {
-            if (!_combinedMatchingLanguages.ContainsKey(match.Key))
-            {
-                _combinedMatchingLanguages[match.Key] = match.Value;
-            }
-            else
-            {
-                var existing = _combinedMatchingLanguages[match.Key];
-                var newScore = existing.MatchingScore + match.Value.MatchingScore;
-                _combinedMatchingLanguages[match.Key] = (newScore, existing.Description);
-            }
-        }
-    }
 
     private void NormalizeWeights()
     {

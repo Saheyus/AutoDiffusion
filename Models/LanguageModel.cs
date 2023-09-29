@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoDiffusion.Models
 {
@@ -7,5 +8,9 @@ namespace AutoDiffusion.Models
         [Key]
         public string? Language { get; set; }
         public string? Description { get; set; }
+        [NotMapped]
+        public int ConfigModelId { get; set; }
+        [NotMapped]
+        public ConfigModel? Config { get; set; }
     }
 }

@@ -1,15 +1,18 @@
-﻿using AutoDiffusion.Models;
+﻿using AutoDiffusion.Data;
+using AutoDiffusion.Models;
 using Microsoft.Data.SqlClient;
 
 namespace AutoDiffusion.Services
 {
     public class ConfigService
     {
+        private readonly AppDbContext _context;
         private readonly IConfiguration _dbConfiguration;
         public ConfigModel Config { get; set; }
 
-        public ConfigService(IConfiguration configuration)
+        public ConfigService(AppDbContext context, IConfiguration configuration)
         {
+            _context = context;
             _dbConfiguration = configuration;
             Config = new ConfigModel();
         }
@@ -84,6 +87,30 @@ namespace AutoDiffusion.Services
                 }
                 return values;
             }
+        }
+
+        public async Task CreateDefaultConfigAsync(string language)
+        {
+            List<string> categories = new List<string> { "Male", "Female", "Last" };
+            List<ConfigModel> defaultConfigs = new List<ConfigModel>();
+
+            foreach (string category in categories)
+            {
+                ConfigModel defaultConfig = new ConfigModel
+                {
+                    SelectedLanguage = language,
+                    SelectedCategory = category,
+                    MinLetters = 4,
+                    MaxLetters = 11,
+                    AccentModifier = 0,
+                    FullName = 0,
+                    FullPlaceName = 0
+                };
+                defaultConfigs.Add(defaultConfig);
+            }
+
+            await _context.Config.AddRangeAsync(defaultConfigs);
+            await _context.SaveChangesAsync();
         }
     }
 }

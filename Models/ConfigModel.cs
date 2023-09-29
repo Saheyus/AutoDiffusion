@@ -30,6 +30,8 @@ namespace AutoDiffusion.Models
 
         [Column("FullPlaceName")]
         public int FullPlaceName { get; set; }
+        [NotMapped]
+        public LanguageModel? Language { get; set; }
 
         [NotMapped]
         public List<string?>? SupportedLanguages { get; set; }

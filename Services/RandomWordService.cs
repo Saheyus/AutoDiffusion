@@ -1,12 +1,14 @@
-﻿using AutoDiffusion.Models;
+﻿using AutoDiffusion.Data;
+using AutoDiffusion.Models;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutoDiffusion.Services;
 
 public class RandomWordService
 {
+    private readonly AppDbContext _context;
     private readonly IConfiguration _dbConfiguration;
     private readonly Random _random = new();
     private readonly NextLetterProbabilities _nextLetterProbabilities;
@@ -15,12 +17,21 @@ public class RandomWordService
     private readonly ConfigService _configService;
     private readonly INameService _nameService;
 
-    public RandomWordService(IConfiguration dbConfiguration, ConfigService configService, INameService nameService)
+    public RandomWordService(IConfiguration dbConfiguration, ConfigService configService, INameService nameService, AppDbContext context)
     {
         _dbConfiguration = dbConfiguration;
+        _context = context;
         _nextLetterProbabilities = new NextLetterProbabilities();
         _configService = configService;
         _nameService = nameService;
+    }
+
+    private async Task<List<string>> GetGeneratedWordsAsync(string language, string type)
+    {
+        return await _context.GeneratedWords
+            .Where(gw => gw.Language == language && gw.Type == type)
+            .Select(gw => gw.Name)
+            .ToListAsync();
     }
 
     public async Task Generate()
@@ -31,14 +42,15 @@ public class RandomWordService
         GeneratedWords.Clear();
 
         string currentLetter = "", randomWord = "", lastLetters = " ";
-        int numberOfWords = 20; // Initialize as per your requirement
+        int numberOfWords = 20;
 
         ConfigModel config = await _configService.GetConfig();
 
         _nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
-        var popularNames = await _nameService.GetPopularNamesByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
+        var existingNames = await _nameService.GetNamesByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
+        var existingGeneratedWords = await GetGeneratedWordsAsync(config.SelectedLanguage, config.SelectedCategory);
 
-        for (var i = 0; i < numberOfWords; i++)
+        for (int i = 0; i < numberOfWords; i++)
         {
             randomWord = "";
             currentLetter = "";
@@ -66,30 +78,26 @@ public class RandomWordService
                 }
                 else
                 {
-                    currentLetter = ReturnLetter(_probabilities, randomWord);
+                    currentLetter = ReturnLetter(_probabilities);
                     randomWord += currentLetter;
 
-                    if (string.IsNullOrEmpty(currentLetter) && !popularNames.Contains(randomWord))
+                    if (string.IsNullOrEmpty(currentLetter) && !existingNames.Contains(randomWord) && !existingGeneratedWords.Contains(randomWord))
                     {
-                        if (!GeneratedWords.Contains(randomWord))  // Check if randomWord already exists in the list
+                        if (!GeneratedWords.Contains(randomWord))
                         {
                             randomWord = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(randomWord.ToLower());
                             GeneratedWords.Add(randomWord);
-                            break;  // Exit the do-while loop
+                            break;
                         }
-                        else
-                        {
-                            randomWord = "";  // Reset the randomWord and continue looping
-                        }
+                        randomWord = "";
                     }
                 }
-
             } while (continueLoop);
         }
     }
 
 
-    private string ReturnLetter(List<(string NextLetter, double Probability)> probabilities, string randomWord)
+    private string ReturnLetter(List<(string NextLetter, double Probability)> probabilities)
     {
         // Calculate total sum of probabilities
         double totalProbability = probabilities.Sum(item => item.Probability);
@@ -215,42 +223,3 @@ public class RandomWordService
 
 
 }
-
-//private string ChooseSeparator(int dashAuthorization, int spaceAuthorization, int apostropheAuthorization)
-//{
-//    var possibleSeparators = "";
-
-//    // Add possible separators based on their authorization flags
-//    if (dashAuthorization == 1) possibleSeparators += "-";
-//    if (spaceAuthorization == 1) possibleSeparators += " ";
-//    if (apostropheAuthorization == 1) possibleSeparators += "'";
-
-//    // Randomly choose one of the possible separators
-//    var randomIndex = _random.Next(possibleSeparators.Length);
-//    return possibleSeparators[randomIndex].ToString();
-//}
-
-//{
-//    diacriticConfiguration = wsDiacriticTable.Cells[2, 1, 210, 4].Value as object[,];
-//}
-
-//string AddDiacritic(object[,] diacriticConfiguration, string returnLetter)
-//{
-//    // Determine if the letter should be uppercase or lowercase
-//    int y = char.IsUpper(returnLetter[0]) ? 3 : 4;
-
-//    string capLetter = returnLetter.ToUpper();
-
-//    for (int x = 0; x < diacriticConfiguration.GetLength(0); x++)
-//    {
-//        if (capLetter == Convert.ToString(diacriticConfiguration[x, 0]) && Convert.ToDouble(diacriticConfiguration[x, 1]) > 0)
-//        {
-//            double randomVar = _random.NextDouble();
-//            if (randomVar < Convert.ToDouble(diacriticConfiguration[x, 1]))
-//            {
-//                return Convert.ToString(diacriticConfiguration[x, y]);
-//            }
-//        }
-//    }
-//    return returnLetter;
-//}

@@ -37,6 +37,9 @@
     <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
         <button class="btn btn-primary btn-block .text-centery" @onclick="NavigateToBulk">Bulk Add</button>
     </li>
+    <li class="mb-2" style="padding-left: 1em; padding-right: 1em">
+        <button class="btn btn-primary btn-block .text-centery" @onclick="NavigateToLanguages">Languages</button>
+    </li>
 </ul>
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -93,6 +96,11 @@
     private void NavigateToBulk()
     {
         NavigationManager.NavigateTo("/BulkAdd");
+    }
+
+    private void NavigateToLanguages()
+    {
+        NavigationManager.NavigateTo("/Languages");
     }
 
 }
