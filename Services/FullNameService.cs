@@ -20,10 +20,10 @@ namespace Autodiffusion.Services
             return await _context.FullNames.ToListAsync();
         }
 
-        public async Task<List<FullNameModel>> GetAsync(string gender = "male")
+        public async Task<List<FullNameModel>> GetAsync(string gender = "male", string language = "french")
         {
             return await _context.FullNames
-                .Where(x => x.Gender == gender)
+                .Where(x => x.Gender == gender && x.Language == language)
                 .ToListAsync();
         }
 
@@ -41,24 +41,33 @@ namespace Autodiffusion.Services
         {
             List<string> fullNames = new List<string>();
 
+            // Fetch existing names from the FullNames table
+            List<string> existingFullNames = await _context.FullNames.Select(f => f.FullName).ToListAsync();
+
             for (int i = 0; i < count; i++)
             {
-                // Fetch first name
-                string firstName = await GenerateNameAsync(language, gender);
+                string fullName = "";
 
-                // Decide whether to add a second first name
-                bool hasSecondFirstName = _random.Next(100) < chanceForSecondFirstName;
-                if (hasSecondFirstName)
+                do
                 {
-                    string secondFirstName = await GenerateNameAsync(language, gender);
-                    firstName += " " + secondFirstName;
-                }
+                    // Fetch first name
+                    string firstName = await GenerateNameAsync(language, gender);
 
-                // Fetch last name
-                string lastName = await GenerateNameAsync(language, "Last");
+                    // Decide whether to add a second first name
+                    bool hasSecondFirstName = _random.Next(100) < chanceForSecondFirstName;
+                    if (hasSecondFirstName)
+                    {
+                        string secondFirstName = await GenerateNameAsync(language, gender);
+                        firstName += " " + secondFirstName;
+                    }
 
-                // Combine first and last names
-                string fullName = $"{firstName} {lastName}";
+                    // Fetch last name
+                    string lastName = await GenerateNameAsync(language, "Last");
+
+                    // Combine first and last names
+                    fullName = $"{firstName} {lastName}";
+
+                } while (fullNames.Contains(fullName) || existingFullNames.Contains(fullName));
 
                 fullNames.Add(fullName);
             }

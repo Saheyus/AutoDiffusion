@@ -67,10 +67,17 @@
 
     <!-- Accent Modifier -->
     <div class="form-group row">
-                <label for="accentModifier" class="col-sm-3 col-form-label text-light">Modificateur d'accent:</label>
+        <label for="accentModifier" class="col-sm-3 col-form-label text-light">Modificateur d'accent:</label>
         <div class="col-sm-6">
             <input type="range" id="accentModifier" min="0" max="5" @bind="ConfigService.Config.AccentModifier" class="form-control-range" />
             <span class="text-light">@ConfigService.Config.AccentModifier</span>
+        </div>
+    </div>
+    <!-- Base Word for Word Generation -->
+    <div class="form-group row">
+        <label for="baseWord" class="col-sm-3 col-form-label text-light">Mot de base:</label>
+        <div class="col-sm-6">
+            <input type="text" id="baseWord" @bind="baseWord" class="form-control" />
         </div>
     </div>
 </form>
@@ -108,6 +115,7 @@
 
 @code {
     private List<string> _savedWords = new();
+    private string baseWord = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,9 +127,17 @@
 
     private async void GenerateRandomWords()
     {
-        await RandomWord.Generate();
+        if (string.IsNullOrEmpty(baseWord))
+        {
+            await RandomWord.Generate();  // Call the original generate method
+        }
+        else
+        {
+            await RandomWord.GenerateWordBasedOn(baseWord);  // Call the new method
+        }
         StateHasChanged();
     }
+
     private async Task SaveWord(string word)
     {
         var currentConfig = ConfigService.Config;

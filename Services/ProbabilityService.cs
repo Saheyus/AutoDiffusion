@@ -299,12 +299,11 @@ namespace AutoDiffusion.Services
             _dbContext.SaveChanges();
         }
 
-        public Dictionary<string, (int MatchingScore, string ClosestWord, string Description)> CheckWordAgainstLanguages(string word)
+        public Dictionary<string, (int MatchingScore, string ClosestWord, string Description)> CheckWordAgainstLanguages(string word, string wordType)
         {
-            int threshold = 6;
 
-            // Fetch relevant name and language data from the database
-            var nameData = _dbContext.Names.ToList();
+            // Filter name and language data from the database based on the wordType
+            var nameData = _dbContext.Names.Where(n => n.Type == wordType).ToList();
             var languageDescriptions = _dbContext.Languages.ToDictionary(l => l.Language, l => l.Description);
 
             // Convert data into the required format for CheckLanguage
@@ -323,10 +322,10 @@ namespace AutoDiffusion.Services
             }
 
             // Call CheckLanguage
-            var unsortedResults = CheckLanguage(word, languageWords, threshold);
+            var unsortedResults = CheckLanguage(word, languageWords);
 
             // Create the result dictionary
-            Dictionary<string, (int MatchingScore, string ClosestWord, string Description)> results = new Dictionary<string, (int, string, string)>();
+            Dictionary<string, (int MatchingScore, string ClosestWord, string Description)> results = new();
 
             foreach (var kvp in unsortedResults)
             {
@@ -368,9 +367,9 @@ namespace AutoDiffusion.Services
         }
 
         // Method to Check Language based on similarity
-        public Dictionary<string, (int MatchingScore, string ClosestWord)> CheckLanguage(string word, Dictionary<string, List<string>> languageWords, int threshold)
+        public Dictionary<string, (int MatchingScore, string ClosestWord)> CheckLanguage(string word, Dictionary<string, List<string>> languageWords)
         {
-            Dictionary<string, (int MatchingScore, string ClosestWord)> matchingLanguages = new Dictionary<string, (int, string)>();
+            Dictionary<string, (int MatchingScore, string ClosestWord)> matchingLanguages = new();
 
             foreach (var language in languageWords.Keys)
             {
@@ -380,7 +379,7 @@ namespace AutoDiffusion.Services
                 foreach (var languageWord in languageWords[language])
                 {
                     int distance = LevenshteinDistance(word.ToLower(), languageWord.ToLower());
-                    if (distance <= threshold && distance < minDistance)
+                    if (distance < minDistance)
                     {
                         minDistance = distance;
                         closestWord = languageWord;

@@ -13,7 +13,7 @@
             <div class="form-group row">
                 <label for="languageSelect" class="col-form-label col-sm-1 text-light">Langue:</label>
                 <div class="col-sm-4">
-                    <select id="languageSelect" @bind="_selectedLanguage" class="form-control">
+                    <select id="languageSelect" @bind="_selectedLanguage" @oninput="OnLanguageSelection" class="form-control">
                         @foreach (var lang in _languages)
                         {
                             <option value="@lang.Language">@lang.Language</option>
@@ -99,7 +99,7 @@
         _generatedFullNames.Clear();
         foreach (var name in fullNames)
         {
-            _generatedFullNames.Add(new FullNameModel { FullName = name, Gender = _selectedGender });
+            _generatedFullNames.Add(new FullNameModel { FullName = name, Gender = _selectedGender, Language = _selectedLanguage });
         }
         StateHasChanged(); 
     }
@@ -114,7 +114,7 @@
     {
         try
         {
-            _savedFullNames = await FullNameService.GetAsync(_selectedGender);
+            _savedFullNames = await FullNameService.GetAsync(_selectedGender, _selectedLanguage);
             StateHasChanged();
         }
         catch (Exception ex)
@@ -123,22 +123,24 @@
         }
     }
 
-
     private async Task DeleteName(int id)
     {
         await FullNameService.DeleteAsync(id);
         await UpdateSavedFullNames();
     }
 
-    private void OnGenderSelection(ChangeEventArgs e)
+    private async void OnGenderSelection(ChangeEventArgs e)
     {
         _selectedGender = e.Value.ToString();
-        _savedFullNames.Clear();
+        _generatedFullNames.Clear();
+        await UpdateSavedFullNames();
     }
 
-    private void OnLanguageSelection(ChangeEventArgs e)
+    private async void OnLanguageSelection(ChangeEventArgs e)
     {
         _selectedLanguage = e.Value.ToString();
+        _generatedFullNames.Clear();
+        await UpdateSavedFullNames(); 
     }
 }
 

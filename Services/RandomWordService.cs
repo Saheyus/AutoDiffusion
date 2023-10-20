@@ -1,14 +1,15 @@
 ﻿using AutoDiffusion.Data;
 using AutoDiffusion.Models;
+using AutoDiffusion.Pages;
 using Microsoft.Data.SqlClient;
 using System.Globalization;
-using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace AutoDiffusion.Services;
 
 public class RandomWordService
 {
-    private readonly AppDbContext _context;
     private readonly IConfiguration _dbConfiguration;
     private readonly Random _random = new();
     private readonly NextLetterProbabilities _nextLetterProbabilities;
@@ -20,18 +21,9 @@ public class RandomWordService
     public RandomWordService(IConfiguration dbConfiguration, ConfigService configService, INameService nameService, AppDbContext context)
     {
         _dbConfiguration = dbConfiguration;
-        _context = context;
         _nextLetterProbabilities = new NextLetterProbabilities();
         _configService = configService;
         _nameService = nameService;
-    }
-
-    private async Task<List<string>> GetGeneratedWordsAsync(string language, string type)
-    {
-        return await _context.GeneratedWords
-            .Where(gw => gw.Language == language && gw.Type == type)
-            .Select(gw => gw.Name)
-            .ToListAsync();
     }
 
     public async Task Generate()
@@ -48,7 +40,7 @@ public class RandomWordService
 
         _nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
         var existingNames = await _nameService.GetNamesByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
-        var existingGeneratedWords = await GetGeneratedWordsAsync(config.SelectedLanguage, config.SelectedCategory);
+        var existingGeneratedWords = await _nameService.GetGeneratedWordsByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
 
         for (int i = 0; i < numberOfWords; i++)
         {
@@ -81,9 +73,11 @@ public class RandomWordService
                     currentLetter = ReturnLetter(_probabilities);
                     randomWord += currentLetter;
 
-                    if (string.IsNullOrEmpty(currentLetter) && !existingNames.Contains(randomWord) && !existingGeneratedWords.Contains(randomWord))
+                    if (string.IsNullOrEmpty(currentLetter) &&
+                        !existingNames.Any(n => n.Equals(randomWord, StringComparison.OrdinalIgnoreCase)) &&
+                        !existingGeneratedWords.Any(n => n.Equals(randomWord, StringComparison.OrdinalIgnoreCase)))
                     {
-                        if (!GeneratedWords.Contains(randomWord))
+                        if (!GeneratedWords.Any(n => n.Equals(randomWord, StringComparison.OrdinalIgnoreCase)))
                         {
                             randomWord = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(randomWord.ToLower());
                             GeneratedWords.Add(randomWord);
@@ -113,8 +107,16 @@ public class RandomWordService
                 return item.NextLetter;
             }
         }
-        // Fallback in case probabilities don't add up correctly, should not occur due to normalization
-        return probabilities.Last().NextLetter;
+        if (probabilities.Any())
+        {
+            return probabilities.Last().NextLetter;
+        }
+        else
+        {
+            // Handle the error, maybe by logging or defaulting to some value
+            Console.WriteLine("No probabilities found, using fallback value.");
+            return "";
+        }
     }
 
     private List<(string NextLetter, double Probability)> FindProbabilitiesByLastLetters(string lastLetters, int currentWordLength, ConfigModel config)
@@ -160,6 +162,65 @@ public class RandomWordService
             .ToList();
         return probabilities;
     }
+
+    public async Task GenerateWordBasedOn(string baseWord)
+    {
+        await using var connection = new SqlConnection(_dbConfiguration.GetConnectionString("DefaultConnection"));
+        await connection.OpenAsync();
+
+        GeneratedWords.Clear();
+        const int uniqueWordsToGenerate = 4;
+        int generatedWordsCount = 0;
+
+        // Fetch existing names and config
+        var existingNames = await _nameService.GetNamesByCountryAndCategoryAsync("language", "category");
+        var existingGeneratedWords = await _nameService.GetGeneratedWordsByCountryAndCategoryAsync("language", "category");
+        var config = await _configService.GetConfig();
+        _nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
+
+        var rand = new Random();  // Initialize Random once instead of in loop
+
+        while (generatedWordsCount < uniqueWordsToGenerate)
+        {
+            var letters = baseWord.ToCharArray().ToList();
+            var maxAttempts = 100;
+            var attempts = 0;
+
+            do
+            {
+                int indexToReplace = rand.Next(1, letters.Count - 1);  // Use the same Random instance
+                string lastLetters = GetLastTwoLetters(string.Concat(letters.Take(indexToReplace))).ToLower();
+                var probabilities = FindProbabilitiesByLastLetters(lastLetters, indexToReplace, config);
+                char currentLetter = letters[indexToReplace];
+
+                if (!probabilities.Any(p => !string.IsNullOrEmpty(p.NextLetter) && p.NextLetter[0] == currentLetter) && probabilities.Count > 0)
+                {
+                    string replacementString = ReturnLetter(probabilities);
+                    if (!string.IsNullOrEmpty(replacementString))
+                    {
+                        char replacementLetter = replacementString[0];
+                        letters[indexToReplace] = replacementLetter;
+                    }
+                }
+
+
+                string newWord = string.Concat(letters);
+
+                if (!GeneratedWords.Contains(newWord, StringComparer.OrdinalIgnoreCase) &&
+                    !existingNames.Contains(newWord, StringComparer.OrdinalIgnoreCase) &&
+                    !existingGeneratedWords.Contains(newWord, StringComparer.OrdinalIgnoreCase))
+                {
+                    GeneratedWords.Add(newWord);
+                    generatedWordsCount++;
+                    break;
+                }
+
+                attempts++;
+            } while (attempts < maxAttempts);
+        }
+    }
+
+
 
     private static string GetLastTwoLetters(string word)
     {

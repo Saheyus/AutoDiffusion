@@ -1,6 +1,5 @@
 ﻿@page "/LanguageMixer"
 @using AutoDiffusion.Services;
-@using AutoDiffusion.Models;
 @using System.Globalization;
 @inject ConfigService ConfigService
 @inject IJSRuntime JsRuntime
@@ -56,6 +55,15 @@
                 <label for="wordInput" class="text-white">Words to Check (comma-separated):</label>
                 <input type="text" class="form-control" id="wordInput" @bind="_wordsToCheck" />
             </div>
+            <div class="form-group">
+                <label for="wordTypeSelect" class="text-white">Word Type:</label>
+                <select id="wordTypeSelect" class="form-control" @bind="_selectedWordType">
+                    <option value="">Any</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Last">Last</option>
+                </select>
+            </div>
             <button class="btn btn-primary" @onclick="CheckLanguages">Check</button>
 
             @if (_combinedMatchingLanguages != null)
@@ -110,6 +118,7 @@
     string _feedbackMessage = "";
     string _alertClass = "alert-danger";
     private string _wordsToCheck;
+    private string _selectedWordType = "";
     Dictionary<string, (int MatchingScore, string ClosestWord, string Description)> _combinedMatchingLanguages = new();
     Dictionary<string, Dictionary<string, string>> _closestWordsForEachLanguage = new();
 
@@ -216,8 +225,9 @@
 
         foreach (var word in words)
         {
-            var matchingLanguages = ProbabilityService.CheckWordAgainstLanguages(word);
-        
+    // Passing _selectedWordType to the CheckWordAgainstLanguages method
+            var matchingLanguages = ProbabilityService.CheckWordAgainstLanguages(word, _selectedWordType);
+    
             foreach (var lang in matchingLanguages)
             {
                 if (_combinedMatchingLanguages.ContainsKey(lang.Key))
@@ -243,7 +253,6 @@
 
         return Task.CompletedTask;
     }
-
 
     private void NormalizeWeights()
     {

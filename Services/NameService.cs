@@ -45,10 +45,13 @@ namespace AutoDiffusion.Services
         }
         public async Task<List<string>> GetGeneratedWordsByCountryAndCategoryAsync(string country, string category)
         {
-            return await _dbContext.GeneratedWords
-                .Where(g => g.Language == country && g.Type == category)
-                .Select(g => g.Name)
-                .ToListAsync();
+            using (var context = new AppDbContext((DbContextOptionsUtility.GetDbContextOptions())))
+            {
+                return await context.GeneratedWords
+                    .Where(g => g.Language == country && g.Type == category)
+                    .Select(g => g.Name)
+                    .ToListAsync();
+            }
         }
 
         public async Task<NameModel> GetNameByIdAsync(int id)
