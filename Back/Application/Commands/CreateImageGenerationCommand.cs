@@ -1,14 +1,14 @@
-﻿namespace Application.Commands
+﻿using Domain.Entities;
+
+namespace Application.Commands
 {
-    public class CreateImageGenerationCommand : ApplicationCommand
+    public class CreateImageGenerationCommand : ApplicationCommand<ImageGeneration>
     {
-        public CreateImageGenerationCommand(string prompt, string scriptName)
+        public CreateImageGenerationCommand(string prompt)
         {
             Prompt = prompt;
-            ScriptName = scriptName;
         }
 
         public string Prompt { get; }
-        public string ScriptName { get; }
     }
 }

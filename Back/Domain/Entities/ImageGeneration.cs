@@ -10,10 +10,15 @@ namespace Domain.Entities
             Id = id;
             Prompt = !string.IsNullOrWhiteSpace(prompt) ? prompt : throw new ArgumentException("Prompt cannot be null or empty!", nameof(prompt));
             State = ImageGenerationStates.Pending;
+            LastModified = DateTime.UtcNow;
+            Created = DateTime.UtcNow;
         }
 
         public string Prompt { get; }
         public Guid Id { get; }
+
+        public DateTime LastModified { get; private set; }
+        public DateTime Created { get; private set; }
 
         public ImageGeneration Root => this;
 
@@ -22,6 +27,8 @@ namespace Domain.Entities
         public void ChangeState(ImageGenerationStates state)
         {
             State = state;
+            LastModified = DateTime.UtcNow;
         }
+
     }
 }

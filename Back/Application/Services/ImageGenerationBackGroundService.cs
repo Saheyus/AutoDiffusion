@@ -1,5 +1,4 @@
 ﻿using System.Threading.Channels;
-using Application.Commands;
 using Application.Events;
 using Application.Ports;
 using Domain.Entities;
@@ -17,7 +16,7 @@ namespace Application.Services
 
     public sealed class ImageGenerationBackGroundService : IHostedService , IImageGenerationQueue, IDisposable
     {
-        private readonly Channel<CreateImageGenerationCommand> _imageGenerationChannel;
+        private readonly Channel<ImageGeneration> _imageGenerationChannel;
         private readonly IPythonScriptInvoker _pythonScriptInvoker;
         private readonly IPublisher _publisher;
         
@@ -25,7 +24,7 @@ namespace Application.Services
         {
             _pythonScriptInvoker = pythonScriptInvoker;
             _publisher = publisher;
-            _imageGenerationChannel = Channel.CreateUnbounded<CreateImageGenerationCommand> (new UnboundedChannelOptions
+            _imageGenerationChannel = Channel.CreateUnbounded<ImageGeneration> (new UnboundedChannelOptions
             {
                 SingleReader = true,
                 SingleWriter = false,
@@ -47,19 +46,22 @@ namespace Application.Services
                             //break loop or retry?...
                             continue;
                         }
-
-                        ApplicationEvent @event;
                         try
                         {
-                            var response = await _pythonScriptInvoker.InvokeAsync(imageGeneration.ScriptName, new []{imageGeneration.Prompt}, cancellationToken);
-                            @event = new PythonScriptFinishedEvent(imageGeneration.Id, response.ExitCode, response.IsSuccessful, response.HasErrors, response.Output, response.ErrorOutput);
+                            var startedEvent = new PythonScriptStartedEvent(imageGeneration.Id);
+                            await _publisher.Publish(startedEvent, cancellationToken);
+
+                            var response = await _pythonScriptInvoker.InvokeAsync(new []{imageGeneration.Prompt}, cancellationToken);
+                            
+                            var finishedEvent = new PythonScriptFinishedEvent(imageGeneration.Id, response.ExitCode, response.IsSuccessful, response.HasErrors, response.Output, response.ErrorOutput);
+                            await _publisher.Publish(finishedEvent, cancellationToken);
                         }
                         catch (Exception ex)
                         {
-                            @event = new PythonScriptFailedEvent(imageGeneration.Id, ex);
+                            var failedEvent = new PythonScriptFailedEvent(imageGeneration.Id, ex);
+                            await _publisher.Publish(failedEvent, cancellationToken);
                         }
 
-                        await _publisher.Publish(@event, cancellationToken);
                     }
                     else
                     {
@@ -81,7 +83,7 @@ namespace Application.Services
         }
 
         //use async void if you do not care whether your item has been written or not to the channel
-        public async Task EnqueueAsync(CreateImageGenerationCommand imageGeneration, CancellationToken cancellationToken = default)
+        public async Task EnqueueAsync(ImageGeneration imageGeneration, CancellationToken cancellationToken = default)
         {
             await _imageGenerationChannel.Writer.WriteAsync(imageGeneration, cancellationToken);
         }

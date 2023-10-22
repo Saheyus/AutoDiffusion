@@ -1,9 +1,9 @@
-﻿using Application.Commands;
+﻿using Domain.Entities;
 
 namespace Application.Ports
 {
     public interface IImageGenerationQueue
     {
-        Task EnqueueAsync(CreateImageGenerationCommand imageGeneration, CancellationToken cancellationToken = default);
+        Task EnqueueAsync(ImageGeneration imageGeneration, CancellationToken cancellationToken = default);
     }
 }

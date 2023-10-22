@@ -8,9 +8,10 @@ namespace Endpoints.Services
     public class PythonScriptInvoker : IPythonScriptInvoker 
     {
         private readonly string _pathToProcess;
-        private readonly string _scriptsDirectory;
+        private readonly string _scriptToInvoke;
+        private readonly string _workingDirectory;
 
-        public PythonScriptInvoker(string pathToProcess, string scriptsDirectory)
+        public PythonScriptInvoker(string pathToProcess, string workingDirectory, string scriptToInvoke)
         {
             if (string.IsNullOrWhiteSpace(pathToProcess))
                 throw new ArgumentNullException(nameof(pathToProcess));
@@ -18,17 +19,24 @@ namespace Endpoints.Services
             if (!pathToProcess.Contains(".exe"))
                 pathToProcess = string.Concat(pathToProcess, ".exe");
 
-            if (!Directory.Exists(scriptsDirectory))
-                throw new DirectoryNotFoundException($"{scriptsDirectory} Does not exists or is not a directory!");
-        
+            if (!Directory.Exists(workingDirectory))
+                throw new ArgumentException($"{workingDirectory} does not exist or is not a directory!");
+
+            if (!scriptToInvoke.Contains(".py"))
+                throw new ArgumentException("Script be a python script of .py extension!", nameof(scriptToInvoke));
+
+            if (!File.Exists(Path.Combine(workingDirectory, scriptToInvoke)))
+                throw new DirectoryNotFoundException($"{scriptToInvoke} does not exists!");
+
             _pathToProcess = pathToProcess;
-            _scriptsDirectory = scriptsDirectory;
+            _scriptToInvoke = scriptToInvoke;
+            _workingDirectory = workingDirectory;
         }
-        public Task<PythonScriptResponse> InvokeAsync(string script, string[] arguments, CancellationToken cancellationToken = default)
+        public Task<PythonScriptResponse> InvokeAsync(string[] arguments, CancellationToken cancellationToken = default)
         {
             return Task.Run(async () =>
             {
-                var processInfo = new ProcessStartInfo(_pathToProcess, "/c " + script + " \"" + string.Join("\", \"", arguments) + "\"")
+                var processInfo = new ProcessStartInfo(_pathToProcess, "/c " + _scriptToInvoke + " \"" + string.Join("\", \"", arguments) + "\"")
                 {
                     CreateNoWindow = true,
                     UseShellExecute = false,
@@ -36,7 +44,7 @@ namespace Endpoints.Services
                     RedirectStandardOutput = true,
                     StandardErrorEncoding = Encoding.UTF8,
                     StandardOutputEncoding = Encoding.UTF8,
-                    WorkingDirectory = _scriptsDirectory
+                    WorkingDirectory = _workingDirectory
                 };
 
                 using var process = Process.Start(processInfo) ??

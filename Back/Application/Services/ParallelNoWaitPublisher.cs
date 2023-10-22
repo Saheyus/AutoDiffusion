@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Endpoints.Services
+namespace Application.Services
 {
     // https://github.com/jbogard/MediatR/blob/master/samples/MediatR.Examples.PublishStrategies/Publisher.cs#L77
     public class ParallelNoWaitPublisher : INotificationPublisher

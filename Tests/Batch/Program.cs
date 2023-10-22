@@ -6,61 +6,20 @@ using Application.Ports;
 using Application.Services;
 using Endpoints.Ports;
 using Endpoints.Services;
+using Infrastructure.Ports;
+using Infrastructure.Repositories;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Linq;
-using System.Reflection;
 
 Console.WriteLine("Hello, World!");
 try
 {
-    /*
-    var processInfo = new ProcessStartInfo("cmd.exe", "/c " + "startpython.bat")
-    {
-        CreateNoWindow = false,
-        UseShellExecute = false,
-        RedirectStandardError = true,
-        RedirectStandardOutput = true
-    };
-
-    using var process = Process.Start(processInfo) ??
-                        throw new Exception($"Could not start process");
-
-    var outputB = new StringBuilder();
-    var errorOutputB = new StringBuilder();
-
-    //Async reading in order to avoid deadlocks
-    //https://stackoverflow.com/questions/5519328/executing-batch-file-in-c-sharp
-    //https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput?view=net-7.0&redirectedfrom=MSDN#System_Diagnostics_ProcessStartInfo_RedirectStandardOutput
-
-    process.OutputDataReceived += WriteOutput;
-    process.BeginOutputReadLine();
-
-    process.ErrorDataReceived += WriteErrorOutput;
-    process.BeginErrorReadLine();
-
-    await process.WaitForExitAsync();
-
-    //local output handlers funcs
-    void WriteErrorOutput(object sender, DataReceivedEventArgs e)
-    {
-        errorOutputB.Append(e.Data);
-    }
-
-    void WriteOutput(object sender, DataReceivedEventArgs e)
-    {
-        outputB.Append(e.Data);
-    }
-
-    Console.WriteLine(outputB.ToString());
-    Console.WriteLine(errorOutputB.ToString());
-        */
-
     var builder = Host.CreateApplicationBuilder(args);
 
     void MediatRConfiguration(MediatRServiceConfiguration cfg)
     {
-        cfg.RegisterServicesFromAssemblies(typeof(ImageGenerationEventHandler).Assembly);
+        cfg.RegisterServicesFromAssemblies(typeof(ImageGenerationEventHandler).Assembly, typeof(ImageGenerationCommandHandler).Assembly);
         cfg.NotificationPublisher = new ParallelNoWaitPublisher();
     }
 
@@ -69,29 +28,31 @@ try
         const string solutionName = "AutoDiffusion";
         var currentDir = Directory.GetCurrentDirectory();
         var idx = currentDir.IndexOf(solutionName, StringComparison.OrdinalIgnoreCase);
-        var solutionRoot = currentDir.Substring(0, idx + solutionName.Length);
-        var scriptsDirectory = solutionRoot + "\\Tests\\Batch\\Scripts";
+        var solutionRoot = currentDir[..(idx + solutionName.Length)];
+        var scriptsDirectory = solutionRoot + @"\Tests\Batch\Scripts";
+        const string scriptToInvoke = "python.py";
 
-        return new PythonScriptInvoker("cmd.exe", scriptsDirectory);
+        return new PythonScriptInvoker("cmd.exe", scriptsDirectory, scriptToInvoke);
     }
 
+    builder.Services.AddMemoryCache(options =>
+    {
+        options.ExpirationScanFrequency = TimeSpan.FromMinutes(1);
+    });
     builder.Services.AddMediatR(MediatRConfiguration);
+    builder.Services.AddSingleton<IImageGenerationRepository, ImageGenerationRepository>();
     builder.Services.AddSingleton<IPythonScriptInvoker, PythonScriptInvoker>(PythonScriptInvokerConfiguration);
     builder.Services.AddSingleton<IImageGenerationQueue, ImageGenerationBackGroundService>();
     builder.Services.AddHostedService(p => (ImageGenerationBackGroundService) p.GetRequiredService<IImageGenerationQueue>());
 
     var app = builder.Build();
     app.StartAsync();
- ;
-    
 
+    var request = new CreateImageGenerationCommand("draw me something interesting");
+    var mediatR = app.Services.GetRequiredService<IMediator>();
+    var result = await mediatR.Send(request);
 
-    var imageGeneration = new CreateImageGenerationCommand("My, . test - \" prompt", "python.py");
-    var imageGeneration2 = new CreateImageGenerationCommand("my other prompt", "python.py");
-
-    var queue = app.Services.GetRequiredService<IImageGenerationQueue>();
-    await queue.EnqueueAsync(imageGeneration);
-    await queue.EnqueueAsync(imageGeneration2);
+    Console.WriteLine(result.Id + " " + result.State);
 
     await app.WaitForShutdownAsync();
 }
