@@ -2,6 +2,7 @@
 using Application.Events;
 using Application.Ports;
 using Domain.Entities;
+using Endpoints.Dtos;
 using Endpoints.Ports;
 using MediatR;
 using Microsoft.Extensions.Hosting;
@@ -46,22 +47,23 @@ namespace Application.Services
                             //break loop or retry?...
                             continue;
                         }
+                      
+                        var startedEvent = new PythonScriptStartedEvent(imageGeneration.Id);
+                        await _publisher.Publish(startedEvent, cancellationToken);
+
+                        PythonScriptResponse response;
                         try
                         {
-                            var startedEvent = new PythonScriptStartedEvent(imageGeneration.Id);
-                            await _publisher.Publish(startedEvent, cancellationToken);
-
-                            var response = await _pythonScriptInvoker.InvokeAsync(new []{imageGeneration.Prompt}, cancellationToken);
-                            
-                            var finishedEvent = new PythonScriptFinishedEvent(imageGeneration.Id, response.ExitCode, response.IsSuccessful, response.HasErrors, response.Output, response.ErrorOutput);
-                            await _publisher.Publish(finishedEvent, cancellationToken);
+                            response = await _pythonScriptInvoker.InvokeAsync(new[] { imageGeneration.Prompt }, cancellationToken);
                         }
                         catch (Exception ex)
                         {
                             var failedEvent = new PythonScriptFailedEvent(imageGeneration.Id, ex);
                             await _publisher.Publish(failedEvent, cancellationToken);
+                            continue;
                         }
-
+                        var finishedEvent = new PythonScriptFinishedEvent(imageGeneration.Id, response.ExitCode, response.IsSuccessful, response.HasErrors, response.Output, response.ErrorOutput);
+                        await _publisher.Publish(finishedEvent, cancellationToken);
                     }
                     else
                     {

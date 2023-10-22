@@ -23,7 +23,7 @@ namespace Endpoints.Services
                 throw new ArgumentException($"{workingDirectory} does not exist or is not a directory!");
 
             if (!scriptToInvoke.Contains(".py"))
-                throw new ArgumentException("Script be a python script of .py extension!", nameof(scriptToInvoke));
+                throw new ArgumentException("Script must be a python script of .py extension!", nameof(scriptToInvoke));
 
             if (!File.Exists(Path.Combine(workingDirectory, scriptToInvoke)))
                 throw new DirectoryNotFoundException($"{scriptToInvoke} does not exists!");

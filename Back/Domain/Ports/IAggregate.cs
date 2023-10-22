@@ -1,6 +1,6 @@
 ﻿namespace Domain.Ports
 {
-    public interface IAggregate<T> 
+    public interface IAggregate<out T> 
     {
         public T Root { get; }
     }
