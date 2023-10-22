@@ -1,0 +1,12 @@
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Endpoints.deps.json
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Endpoints.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Endpoints.pdb
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.GeneratedMSBuildEditorConfig.editorconfig
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.AssemblyInfoInputs.cache
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.AssemblyInfo.cs
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.csproj.CoreCompileInputs.cache
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\refint\Endpoints.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.pdb
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\ref\Endpoints.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.csproj.AssemblyReference.cache
