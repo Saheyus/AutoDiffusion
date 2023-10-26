@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "IIX1rXi1cJuywo2f5d+rCV4YkAE3VeSg+X9sZgmWE7ctHUZlrBDC0iSmZFFiB97hbo2zAS1D1DzPLrimjYFqyg==",
+  "dgSpecHash": "aqeedozvdAVeGsvQDQcW+KXZCIqlJcYlLjFEmxDFrL2vRTUKye8Se49+SD5fO1r8RiPJFCK45tV6m4UJq0JLNA==",
   "success": true,
-  "projectFilePath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
+  "projectFilePath": "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\roman.silagadze\\.nuget\\packages\\mediatr\\12.1.1\\mediatr.12.1.1.nupkg.sha512",
-    "C:\\Users\\roman.silagadze\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
-    "C:\\Users\\roman.silagadze\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
+    "C:\\Users\\Saheyus\\.nuget\\packages\\mediatr\\12.1.1\\mediatr.12.1.1.nupkg.sha512",
+    "C:\\Users\\Saheyus\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\Saheyus\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }

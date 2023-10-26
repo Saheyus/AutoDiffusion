@@ -113,25 +113,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\roman.silagadze\\.nuget\\packages\\": {},
+    "C:\\Users\\Saheyus\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
+      "projectUniqueName": "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
       "projectName": "Endpoints",
-      "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
-      "packagesPath": "C:\\Users\\roman.silagadze\\.nuget\\packages\\",
-      "outputPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\obj\\",
+      "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
+      "packagesPath": "C:\\Users\\Saheyus\\.nuget\\packages\\",
+      "outputPath": "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\roman.silagadze\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Saheyus\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -139,6 +139,8 @@
         "net7.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -178,7 +180,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100-rc.1.23455.8\\RuntimeIdentifierGraph.json"
       }
     }
   }
