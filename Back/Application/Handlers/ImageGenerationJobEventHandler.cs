@@ -6,30 +6,30 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Application.Handlers
 {
-    public sealed class ImageGenerationEventHandler : 
+    public sealed class ImageGenerationJobEventHandler : 
         INotificationHandler<PythonScriptFailedEvent>,
         INotificationHandler<PythonScriptFinishedEvent>,
         INotificationHandler<PythonScriptStartedEvent>
     {
         private readonly IMemoryCache _cache;
-        private readonly IImageGenerationRepository _imageGenerationRepository;
+        private readonly IImageGenerationJobRepository _imageGenerationJobRepository;
         private readonly TimeSpan _cacheSlidingExpiration = TimeSpan.FromMinutes(10);
 
-        public ImageGenerationEventHandler(IMemoryCache cache, IImageGenerationRepository imageGenerationRepository)
+        public ImageGenerationJobEventHandler(IMemoryCache cache, IImageGenerationJobRepository imageGenerationJobRepository)
         {
             _cache = cache;
-            _imageGenerationRepository = imageGenerationRepository;
+            _imageGenerationJobRepository = imageGenerationJobRepository;
         }
 
         public async Task Handle(PythonScriptFailedEvent notification, CancellationToken cancellationToken = default)
         {
-            var imageGeneration = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationId, cancellationToken);
+            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationId, cancellationToken);
 
-            imageGeneration.ChangeState(ImageGenerationStates.Failed);
+            imageGenerationJob.ChangeState(ImageGenerationJobStates.Failed);
 
-            await _imageGenerationRepository.SaveAsync(imageGeneration, cancellationToken);
+            await _imageGenerationJobRepository.SaveAsync(imageGenerationJob, cancellationToken);
 
-            _cache.Set(imageGeneration.Id, imageGeneration, new MemoryCacheEntryOptions
+            _cache.Set(imageGenerationJob.Id, imageGenerationJob, new MemoryCacheEntryOptions
             {
                 SlidingExpiration = _cacheSlidingExpiration,
                 Priority = CacheItemPriority.Low
@@ -47,13 +47,13 @@ namespace Application.Handlers
 
             await Task.Delay(10000, cancellationToken);
           
-            var imageGeneration = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationId, cancellationToken);
+            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationId, cancellationToken);
 
-            imageGeneration.ChangeState(ImageGenerationStates.Finished);
+            imageGenerationJob.ChangeState(ImageGenerationJobStates.Finished);
 
-            await _imageGenerationRepository.SaveAsync(imageGeneration, cancellationToken);
+            await _imageGenerationJobRepository.SaveAsync(imageGenerationJob, cancellationToken);
 
-            _cache.Set(imageGeneration.Id, imageGeneration, new MemoryCacheEntryOptions
+            _cache.Set(imageGenerationJob.Id, imageGenerationJob, new MemoryCacheEntryOptions
             {
                 SlidingExpiration = _cacheSlidingExpiration,
                 Priority = CacheItemPriority.Normal
@@ -64,9 +64,9 @@ namespace Application.Handlers
         {
             var imageGeneration = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationId, cancellationToken);
 
-            imageGeneration.ChangeState(ImageGenerationStates.Running);
+            imageGeneration.ChangeState(ImageGenerationJobStates.Running);
 
-            await _imageGenerationRepository.SaveAsync(imageGeneration, cancellationToken);
+            await _imageGenerationJobRepository.SaveAsync(imageGeneration, cancellationToken);
 
             _cache.Set(imageGeneration.Id, imageGeneration, new MemoryCacheEntryOptions
             {
@@ -75,16 +75,16 @@ namespace Application.Handlers
             });
         }
 
-        private async Task<ImageGeneration> GetFromCacheOrRepositoryAsync(Guid imageGenerationId, CancellationToken cancellationToken = default)
+        private async Task<ImageGenerationJob> GetFromCacheOrRepositoryAsync(Guid imageGenerationJobId, CancellationToken cancellationToken = default)
         {
-            if (!_cache.TryGetValue(imageGenerationId, out ImageGeneration? imageGeneration) || imageGeneration == null)
+            if (!_cache.TryGetValue(imageGenerationJobId, out ImageGenerationJob? imageGenerationJob) || imageGenerationJob == null)
             {
-                imageGeneration = await _imageGenerationRepository.GetAsync(imageGenerationId, cancellationToken);
+                imageGenerationJob = await _imageGenerationJobRepository.GetAsync(imageGenerationJobId, cancellationToken);
             }
-            if (imageGeneration == null)
-                throw new NullReferenceException($"Cannot find generation {imageGenerationId} from repository! Inconsistent state between repository and application!");
+            if (imageGenerationJob == null)
+                throw new NullReferenceException($"Cannot find generation {imageGenerationJobId} from repository! Inconsistent state between repository and application!");
 
-            return imageGeneration;
+            return imageGenerationJob;
         }
     }
 }

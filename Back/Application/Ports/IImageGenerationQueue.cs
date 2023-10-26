@@ -4,6 +4,6 @@ namespace Application.Ports
 {
     public interface IImageGenerationQueue
     {
-        Task EnqueueAsync(ImageGeneration imageGeneration, CancellationToken cancellationToken = default);
+        Task EnqueueAsync(ImageGenerationJob imageGeneration, CancellationToken cancellationToken = default);
     }
 }

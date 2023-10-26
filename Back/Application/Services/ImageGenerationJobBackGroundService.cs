@@ -15,17 +15,17 @@ namespace Application.Services
     //handle dispose 
     //handle EnqueueAsync exceptions
 
-    public sealed class ImageGenerationBackGroundService : IHostedService , IImageGenerationQueue, IDisposable
+    public sealed class ImageGenerationJobBackGroundService : IHostedService , IImageGenerationQueue, IDisposable
     {
-        private readonly Channel<ImageGeneration> _imageGenerationChannel;
+        private readonly Channel<ImageGenerationJob> _imageGenerationJobChannel;
         private readonly IPythonScriptInvoker _pythonScriptInvoker;
         private readonly IPublisher _publisher;
         
-        public ImageGenerationBackGroundService(IPythonScriptInvoker pythonScriptInvoker, IPublisher publisher)
+        public ImageGenerationJobBackGroundService(IPythonScriptInvoker pythonScriptInvoker, IPublisher publisher)
         {
             _pythonScriptInvoker = pythonScriptInvoker;
             _publisher = publisher;
-            _imageGenerationChannel = Channel.CreateUnbounded<ImageGeneration> (new UnboundedChannelOptions
+            _imageGenerationJobChannel = Channel.CreateUnbounded<ImageGenerationJob> (new UnboundedChannelOptions
             {
                 SingleReader = true,
                 SingleWriter = false,
@@ -37,32 +37,33 @@ namespace Application.Services
         {
             Task.Run(async () =>
             {
+                //TO DO Get back pending jobs from database, if any
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    if (await _imageGenerationChannel.Reader.WaitToReadAsync(cancellationToken))
+                    if (await _imageGenerationJobChannel.Reader.WaitToReadAsync(cancellationToken))
                     {
-                        if (!_imageGenerationChannel.Reader.TryRead(out var imageGeneration))
+                        if (!_imageGenerationJobChannel.Reader.TryRead(out var imageGenerationJob))
                         {
                             //handle unread task
                             //break loop or retry?...
                             continue;
                         }
                       
-                        var startedEvent = new PythonScriptStartedEvent(imageGeneration.Id);
+                        var startedEvent = new PythonScriptStartedEvent(imageGenerationJob.Id);
                         await _publisher.Publish(startedEvent, cancellationToken);
 
                         PythonScriptResponse response;
                         try
                         {
-                            response = await _pythonScriptInvoker.InvokeAsync(new[] { imageGeneration.Prompt }, cancellationToken);
+                            response = await _pythonScriptInvoker.InvokeAsync(new[] { imageGenerationJob.InputText }, cancellationToken);
                         }
                         catch (Exception ex)
                         {
-                            var failedEvent = new PythonScriptFailedEvent(imageGeneration.Id, ex);
+                            var failedEvent = new PythonScriptFailedEvent(imageGenerationJob.Id, ex);
                             await _publisher.Publish(failedEvent, cancellationToken);
                             continue;
                         }
-                        var finishedEvent = new PythonScriptFinishedEvent(imageGeneration.Id, response.ExitCode, response.IsSuccessful, response.HasErrors, response.Output, response.ErrorOutput);
+                        var finishedEvent = new PythonScriptFinishedEvent(imageGenerationJob.Id, response.ExitCode, response.IsSuccessful, response.HasErrors, response.Output, response.ErrorOutput);
                         await _publisher.Publish(finishedEvent, cancellationToken);
                     }
                     else
@@ -85,9 +86,9 @@ namespace Application.Services
         }
 
         //use async void if you do not care whether your item has been written or not to the channel
-        public async Task EnqueueAsync(ImageGeneration imageGeneration, CancellationToken cancellationToken = default)
+        public async Task EnqueueAsync(ImageGenerationJob imageGenerationJob, CancellationToken cancellationToken = default)
         {
-            await _imageGenerationChannel.Writer.WriteAsync(imageGeneration, cancellationToken);
+            await _imageGenerationJobChannel.Writer.WriteAsync(imageGenerationJob, cancellationToken);
         }
 
         public void Dispose()

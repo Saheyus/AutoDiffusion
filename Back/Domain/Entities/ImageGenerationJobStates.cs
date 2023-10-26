@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities
 {
-    public enum ImageGenerationStates
+    public enum ImageGenerationJobStates
     {
         Pending = 0,
         Running = 1,

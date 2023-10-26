@@ -19,7 +19,7 @@ try
 
     void MediatRConfiguration(MediatRServiceConfiguration cfg)
     {
-        cfg.RegisterServicesFromAssemblies(typeof(ImageGenerationEventHandler).Assembly, typeof(ImageGenerationCommandHandler).Assembly);
+        cfg.RegisterServicesFromAssemblies(typeof(ImageGenerationJobEventHandler).Assembly, typeof(ImageGenerationJobCommandHandler).Assembly);
         cfg.NotificationPublisher = new ParallelNoWaitPublisher();
     }
 
@@ -40,15 +40,15 @@ try
         options.ExpirationScanFrequency = TimeSpan.FromMinutes(1);
     });
     builder.Services.AddMediatR(MediatRConfiguration);
-    builder.Services.AddSingleton<IImageGenerationRepository, ImageGenerationRepository>();
+    builder.Services.AddSingleton<IImageGenerationJobRepository, ImageGenerationJobRepository>();
     builder.Services.AddSingleton<IPythonScriptInvoker, PythonScriptInvoker>(PythonScriptInvokerConfiguration);
-    builder.Services.AddSingleton<IImageGenerationQueue, ImageGenerationBackGroundService>();
-    builder.Services.AddHostedService(p => (ImageGenerationBackGroundService) p.GetRequiredService<IImageGenerationQueue>());
+    builder.Services.AddSingleton<IImageGenerationQueue, ImageGenerationJobBackGroundService>();
+    builder.Services.AddHostedService(p => (ImageGenerationJobBackGroundService) p.GetRequiredService<IImageGenerationQueue>());
 
     var app = builder.Build();
     app.StartAsync();
 
-    var request = new CreateImageGenerationCommand("draw me something interesting");
+    var request = new CreateImageGenerationJobCommand("draw me something interesting");
     var mediatR = app.Services.GetRequiredService<IMediator>();
     var result = await mediatR.Send(request);
 
