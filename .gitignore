@@ -12,6 +12,8 @@
 *.sln.docstates
 *.cache
 .cache
+*.dll
+*.pdb
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
