@@ -81,6 +81,7 @@ namespace Domain.EventHandlers
             {
                 imageGenerationJob = await _imageGenerationJobRepository.GetAsync(imageGenerationJobId, cancellationToken);
             }
+
             if (imageGenerationJob == null)
                 throw new NullReferenceException($"Cannot find generation {imageGenerationJobId} from repository! Inconsistent state between repository and application!");
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Domain.Entities;
+using Domain.Exceptions;
 using Domain.Ports;
 
 namespace Infrastructure.Repositories
@@ -8,12 +9,12 @@ namespace Infrastructure.Repositories
     {
         private static readonly ConcurrentDictionary<Guid, ImageGenerationJob> Generations = new();
 
-        public Task<ImageGenerationJob?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+        public Task<ImageGenerationJob> GetAsync(Guid id, CancellationToken cancellationToken = default)
         {
             if (Generations.TryGetValue(id, out var generation))
-                return Task.FromResult(generation)!;
+                return Task.FromResult(generation);
 
-            return Task.FromResult<ImageGenerationJob?>(null);
+            throw new ImageGenerationJobNotFoundException(id);
         }
 
         public Task<IEnumerable<ImageGenerationJob>> GetAllAsync(CancellationToken cancellationToken = default)
