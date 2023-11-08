@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Domain.Events;
+using Domain.Notifications;
 using Domain.Ports;
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,17 +14,19 @@ namespace Domain.EventHandlers
     {
         private readonly IMemoryCache _cache;
         private readonly IImageGenerationJobRepository _imageGenerationJobRepository;
+        private readonly IPublisher _publisher;
         private readonly TimeSpan _cacheSlidingExpiration = TimeSpan.FromMinutes(10);
 
-        public ImageGenerationJobEventHandler(IMemoryCache cache, IImageGenerationJobRepository imageGenerationJobRepository)
+        public ImageGenerationJobEventHandler(IMemoryCache cache, IImageGenerationJobRepository imageGenerationJobRepository, IPublisher publisher)
         {
             _cache = cache;
             _imageGenerationJobRepository = imageGenerationJobRepository;
+            _publisher = publisher;
         }
 
-        public async Task Handle(ImageGenerationJobFailedEvent notification, CancellationToken cancellationToken = default)
+        public async Task Handle(ImageGenerationJobFailedEvent @event, CancellationToken cancellationToken = default)
         {
-            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationJobId, cancellationToken);
+            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(@event.ImageGenerationJobId, cancellationToken);
 
             imageGenerationJob.ChangeState(ImageGenerationJobStates.Failed);
 
@@ -36,20 +39,19 @@ namespace Domain.EventHandlers
             });
         }
 
-        public async Task Handle(ImageGenerationJobFinishedEvent notification, CancellationToken cancellationToken = default)
+        public async Task Handle(ImageGenerationJobFinishedEvent @event, CancellationToken cancellationToken = default)
         {
             //handle script finished event here
             //parse output, save state & create notification event for notification handler
 
-            Console.WriteLine(notification.Output);
-            Console.WriteLine(notification.ErrorOutput);
-            Console.WriteLine(notification.ExitCode);
+            Console.WriteLine(@event.Output);
+            Console.WriteLine(@event.ErrorOutput);
+            Console.WriteLine(@event.ExitCode);
 
-            await Task.Delay(10000, cancellationToken);
-          
-            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationJobId, cancellationToken);
+            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(@event.ImageGenerationJobId, cancellationToken);
 
             imageGenerationJob.ChangeState(ImageGenerationJobStates.Finished);
+            imageGenerationJob.AddImageUri(new Uri("file:///c:/whatever.png"));
 
             await _imageGenerationJobRepository.SaveAsync(imageGenerationJob, cancellationToken);
 
@@ -58,11 +60,14 @@ namespace Domain.EventHandlers
                 SlidingExpiration = _cacheSlidingExpiration,
                 Priority = CacheItemPriority.Normal
             });
+
+            //Publish notification
+            await _publisher.Publish(new ImageGenerationJobNotification(imageGenerationJob), cancellationToken);
         }
 
-        public async Task Handle(ImageGenerationJobStartedEvent notification, CancellationToken cancellationToken = default)
+        public async Task Handle(ImageGenerationJobStartedEvent @event, CancellationToken cancellationToken = default)
         {
-            var imageGeneration = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationJobId, cancellationToken);
+            var imageGeneration = await GetFromCacheOrRepositoryAsync(@event.ImageGenerationJobId, cancellationToken);
 
             imageGeneration.ChangeState(ImageGenerationJobStates.Running);
 

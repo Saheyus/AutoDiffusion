@@ -5,6 +5,7 @@ using Application.Handlers;
 using Application.Ports;
 using Application.Services;
 using Domain.EventHandlers;
+using Domain.Notifications;
 using Domain.Ports;
 using Endpoints.Services;
 using Infrastructure.Repositories;
@@ -19,7 +20,11 @@ try
 
     void MediatRConfiguration(MediatRServiceConfiguration cfg)
     {
-        cfg.RegisterServicesFromAssemblies(typeof(ImageGenerationJobEventHandler).Assembly, typeof(ImageGenerationJobCommandHandler).Assembly);
+        cfg.RegisterServicesFromAssemblies(
+            typeof(ImageGenerationJobEventHandler).Assembly,
+            typeof(ImageGenerationJobCommandHandler).Assembly,
+            typeof(NotificationsHandler).Assembly
+            );
         cfg.NotificationPublisher = new ParallelNoWaitPublisher();
     }
 
