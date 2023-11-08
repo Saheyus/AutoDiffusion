@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Projets\\AutoDiffusion\\Back\\Application\\Application.csproj": {}
+    "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Application\\Application.csproj": {}
   },
   "projects": {
-    "F:\\Projets\\AutoDiffusion\\Back\\Application\\Application.csproj": {
+    "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Projets\\AutoDiffusion\\Back\\Application\\Application.csproj",
+        "projectUniqueName": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Application\\Application.csproj",
-        "packagesPath": "C:\\Users\\Saheyus\\.nuget\\packages\\",
-        "outputPath": "F:\\Projets\\AutoDiffusion\\Back\\Application\\obj\\",
+        "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Application\\Application.csproj",
+        "packagesPath": "C:\\Users\\roman.silagadze\\.nuget\\packages\\",
+        "outputPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Saheyus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\roman.silagadze\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,22 +26,20 @@
           "net7.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "F:\\Projets\\AutoDiffusion\\Back\\Domain\\Domain.csproj": {
-                "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Domain\\Domain.csproj"
+              "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj"
               },
-              "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj": {
-                "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj"
+              "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj": {
+                "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj"
               },
-              "F:\\Projets\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj"
+              "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -89,25 +87,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100-rc.1.23455.8\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\Projets\\AutoDiffusion\\Back\\Domain\\Domain.csproj": {
+    "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Projets\\AutoDiffusion\\Back\\Domain\\Domain.csproj",
+        "projectUniqueName": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Domain\\Domain.csproj",
-        "packagesPath": "C:\\Users\\Saheyus\\.nuget\\packages\\",
-        "outputPath": "F:\\Projets\\AutoDiffusion\\Back\\Domain\\obj\\",
+        "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\roman.silagadze\\.nuget\\packages\\",
+        "outputPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Saheyus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\roman.silagadze\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -115,8 +113,6 @@
           "net7.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -150,25 +146,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100-rc.1.23455.8\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj": {
+    "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
+        "projectUniqueName": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
         "projectName": "Endpoints",
-        "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
-        "packagesPath": "C:\\Users\\Saheyus\\.nuget\\packages\\",
-        "outputPath": "F:\\Projets\\AutoDiffusion\\Back\\Endpoints\\obj\\",
+        "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
+        "packagesPath": "C:\\Users\\roman.silagadze\\.nuget\\packages\\",
+        "outputPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Saheyus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\roman.silagadze\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -176,8 +172,6 @@
           "net7.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -217,25 +211,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100-rc.1.23455.8\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\Projets\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj": {
+    "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Projets\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\Saheyus\\.nuget\\packages\\",
-        "outputPath": "F:\\Projets\\AutoDiffusion\\Back\\Infrastructure\\obj\\",
+        "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\roman.silagadze\\.nuget\\packages\\",
+        "outputPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Saheyus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\roman.silagadze\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -243,16 +237,14 @@
           "net7.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "F:\\Projets\\AutoDiffusion\\Back\\Domain\\Domain.csproj": {
-                "projectPath": "F:\\Projets\\AutoDiffusion\\Back\\Domain\\Domain.csproj"
+              "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj"
               }
             }
           }
@@ -282,7 +274,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100-rc.1.23455.8\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
         }
       }
     }
