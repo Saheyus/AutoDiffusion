@@ -1,4 +1,4 @@
-﻿namespace Endpoints.Dtos
+﻿namespace Application.Dtos
 {
     public sealed class PythonScriptResponse
     {

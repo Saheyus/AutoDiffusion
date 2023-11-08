@@ -1,10 +1,10 @@
-﻿using MediatR;
-using Application.Events;
-using Domain.Entities;
-using Infrastructure.Ports;
+﻿using Domain.Entities;
+using Domain.Events;
+using Domain.Ports;
+using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Application.Handlers
+namespace Domain.EventHandlers
 {
     public sealed class ImageGenerationJobEventHandler : 
         INotificationHandler<ImageGenerationJobFailedEvent>,

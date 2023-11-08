@@ -1,12 +1,12 @@
 ﻿using MediatR;
 
-namespace Application.Events
+namespace Domain.Events
 {
-    public abstract class ApplicationEvent<T> : ApplicationEvent
+    public abstract class DomainEvent<T> : ApplicationEvent
     {
         public T Data { get; }
 
-        protected ApplicationEvent(T data)
+        protected DomainEvent(T data)
         {
             Data = data;
         }

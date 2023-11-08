@@ -1,7 +1,7 @@
 ﻿using Application.Commands;
 using Application.Ports;
 using Domain.Entities;
-using Infrastructure.Ports;
+using Domain.Ports;
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 

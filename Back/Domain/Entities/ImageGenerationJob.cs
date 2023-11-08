@@ -24,7 +24,7 @@ namespace Domain.Entities
 
         public ImageGenerationJobStates State { get; private set; }
 
-        public void ChangeState(ImageGenerationJobStates state)
+        internal void ChangeState(ImageGenerationJobStates state)
         {
             State = state;
             LastModified = DateTime.UtcNow;

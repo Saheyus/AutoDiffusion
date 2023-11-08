@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Endpoints.Dtos;
-using Endpoints.Ports;
+using Application.Dtos;
+using Application.Ports;
+
 
 namespace Endpoints.Services
 {

@@ -1,9 +1,7 @@
 ﻿using Application.Commands;
-using Application.Events;
+using Application.Dtos;
 using Application.Ports;
-using Domain.Entities;
-using Endpoints.Dtos;
-using Endpoints.Ports;
+using Domain.Events;
 using MediatR;
 
 namespace Application.Handlers

@@ -1,6 +1,6 @@
-﻿using Endpoints.Dtos;
+﻿using Application.Dtos;
 
-namespace Endpoints.Ports
+namespace Application.Ports
 {
     public interface IPythonScriptInvoker
     {

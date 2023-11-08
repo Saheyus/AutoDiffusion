@@ -1,6 +1,6 @@
 ﻿using Domain.Entities;
 
-namespace Infrastructure.Ports
+namespace Domain.Ports
 {
     public interface IImageGenerationJobRepository
     {
