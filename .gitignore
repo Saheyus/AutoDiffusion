@@ -402,3 +402,20 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /.vs/AutoDiffusion/DesignTimeBuild/.dtbcache.v2
+/Back/Application/obj/Debug/net7.0/Application.AssemblyInfo.cs
+/Back/Application/obj/Debug/net7.0/Application.AssemblyInfoInputs.cache
+/Back/Application/obj/Debug/net7.0/Application.assets.cache
+/Back/Application/obj/Debug/net7.0/Application.GeneratedMSBuildEditorConfig.editorconfig
+/Back/Domain/obj/Debug/net7.0/Domain.AssemblyInfo.cs
+/Back/Domain/obj/Debug/net7.0/Domain.AssemblyInfoInputs.cache
+/Back/Domain/obj/Debug/net7.0/Domain.assets.cache
+/Back/Domain/obj/Debug/net7.0/Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Back/Endpoints/obj/Debug/net7.0/Endpoints.AssemblyInfo.cs
+/Back/Endpoints/obj/Debug/net7.0/Endpoints.AssemblyInfoInputs.cache
+/Back/Endpoints/obj/Debug/net7.0/Endpoints.assets.cache
+/Back/Endpoints/obj/Debug/net7.0/Endpoints.csproj.AssemblyReference.cache
+/Back/Endpoints/obj/Debug/net7.0/Endpoints.GeneratedMSBuildEditorConfig.editorconfig
+/Back/Infrastructure/obj/Debug/net7.0/Infrastructure.AssemblyInfo.cs
+/Back/Infrastructure/obj/Debug/net7.0/Infrastructure.AssemblyInfoInputs.cache
+/Back/Infrastructure/obj/Debug/net7.0/Infrastructure.assets.cache
+/Back/Infrastructure/obj/Debug/net7.0/Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
