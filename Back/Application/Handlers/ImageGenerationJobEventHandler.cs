@@ -7,9 +7,9 @@ using Microsoft.Extensions.Caching.Memory;
 namespace Application.Handlers
 {
     public sealed class ImageGenerationJobEventHandler : 
-        INotificationHandler<PythonScriptFailedEvent>,
-        INotificationHandler<PythonScriptFinishedEvent>,
-        INotificationHandler<PythonScriptStartedEvent>
+        INotificationHandler<ImageGenerationJobFailedEvent>,
+        INotificationHandler<ImageGenerationJobFinishedEvent>,
+        INotificationHandler<ImageGenerationJobStartedEvent>
     {
         private readonly IMemoryCache _cache;
         private readonly IImageGenerationJobRepository _imageGenerationJobRepository;
@@ -21,9 +21,9 @@ namespace Application.Handlers
             _imageGenerationJobRepository = imageGenerationJobRepository;
         }
 
-        public async Task Handle(PythonScriptFailedEvent notification, CancellationToken cancellationToken = default)
+        public async Task Handle(ImageGenerationJobFailedEvent notification, CancellationToken cancellationToken = default)
         {
-            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationId, cancellationToken);
+            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationJobId, cancellationToken);
 
             imageGenerationJob.ChangeState(ImageGenerationJobStates.Failed);
 
@@ -36,7 +36,7 @@ namespace Application.Handlers
             });
         }
 
-        public async Task Handle(PythonScriptFinishedEvent notification, CancellationToken cancellationToken = default)
+        public async Task Handle(ImageGenerationJobFinishedEvent notification, CancellationToken cancellationToken = default)
         {
             //handle script finished event here
             //parse output, save state & create notification event for notification handler
@@ -47,7 +47,7 @@ namespace Application.Handlers
 
             await Task.Delay(10000, cancellationToken);
           
-            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationId, cancellationToken);
+            var imageGenerationJob = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationJobId, cancellationToken);
 
             imageGenerationJob.ChangeState(ImageGenerationJobStates.Finished);
 
@@ -60,9 +60,9 @@ namespace Application.Handlers
             });
         }
 
-        public async Task Handle(PythonScriptStartedEvent notification, CancellationToken cancellationToken = default)
+        public async Task Handle(ImageGenerationJobStartedEvent notification, CancellationToken cancellationToken = default)
         {
-            var imageGeneration = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationId, cancellationToken);
+            var imageGeneration = await GetFromCacheOrRepositoryAsync(notification.ImageGenerationJobId, cancellationToken);
 
             imageGeneration.ChangeState(ImageGenerationJobStates.Running);
 

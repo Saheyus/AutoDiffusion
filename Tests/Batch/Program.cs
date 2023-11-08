@@ -42,8 +42,9 @@ try
     builder.Services.AddMediatR(MediatRConfiguration);
     builder.Services.AddSingleton<IImageGenerationJobRepository, ImageGenerationJobRepository>();
     builder.Services.AddSingleton<IPythonScriptInvoker, PythonScriptInvoker>(PythonScriptInvokerConfiguration);
-    builder.Services.AddSingleton<IImageGenerationQueue, ImageGenerationJobBackGroundService>();
-    builder.Services.AddHostedService(p => (ImageGenerationJobBackGroundService) p.GetRequiredService<IImageGenerationQueue>());
+    builder.Services.AddSingleton<IImageGenerationCommandQueue, ImageGenerationJobCommandBackGroundService>();
+    builder.Services.AddSingleton<IImageGenerationCommandProcessor, ImageGenerationCommandProcessor>();
+    builder.Services.AddHostedService(p => (ImageGenerationJobCommandBackGroundService) p.GetRequiredService<IImageGenerationCommandQueue>());
 
     var app = builder.Build();
     app.StartAsync();

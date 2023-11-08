@@ -11,15 +11,15 @@ namespace Application.Handlers
     {
         private readonly IMemoryCache _cache;
         private readonly TimeSpan _cacheSlidingExpiration = TimeSpan.FromMinutes(10);
-        private readonly IImageGenerationQueue _queue;
+        private readonly IImageGenerationCommandQueue _commandQueue;
         private readonly IImageGenerationJobRepository _imageGenerationRepository;
 
         public ImageGenerationJobCommandHandler(IMemoryCache cache,
-            IImageGenerationQueue queue, 
+            IImageGenerationCommandQueue commandQueue, 
             IImageGenerationJobRepository imageGenerationRepository)
         {
             _cache = cache;
-            _queue = queue;
+            _commandQueue = commandQueue;
             _imageGenerationRepository = imageGenerationRepository;
         }
 
@@ -35,7 +35,7 @@ namespace Application.Handlers
                 Priority = CacheItemPriority.High
             });
 
-            await _queue.EnqueueAsync(imageGenerationJob, cancellationToken);
+            await _commandQueue.EnqueueAsync(command, cancellationToken);
 
             return imageGenerationJob;
         }
