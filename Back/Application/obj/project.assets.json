@@ -205,26 +205,15 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
         "dependencies": {
-          "MediatR.Contracts": "2.0.1"
+          "MediatR": "12.1.1",
+          "MediatR.Contracts": "2.0.1",
+          "Microsoft.Extensions.Caching.Abstractions": "7.0.0"
         },
         "compile": {
           "bin/placeholder/Domain.dll": {}
         },
         "runtime": {
           "bin/placeholder/Domain.dll": {}
-        }
-      },
-      "Endpoints/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v7.0",
-        "dependencies": {
-          "MediatR": "12.1.1"
-        },
-        "compile": {
-          "bin/placeholder/Endpoints.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Endpoints.dll": {}
         }
       },
       "Infrastructure/1.0.0": {
@@ -570,11 +559,6 @@
       "path": "../Domain/Domain.csproj",
       "msbuildProject": "../Domain/Domain.csproj"
     },
-    "Endpoints/1.0.0": {
-      "type": "project",
-      "path": "../Endpoints/Endpoints.csproj",
-      "msbuildProject": "../Endpoints/Endpoints.csproj"
-    },
     "Infrastructure/1.0.0": {
       "type": "project",
       "path": "../Infrastructure/Infrastructure.csproj",
@@ -584,7 +568,6 @@
   "projectFileDependencyGroups": {
     "net7.0": [
       "Domain >= 1.0.0",
-      "Endpoints >= 1.0.0",
       "Infrastructure >= 1.0.0",
       "MediatR >= 12.1.1",
       "Microsoft.Extensions.Caching.Abstractions >= 7.0.0",
@@ -627,9 +610,6 @@
           "projectReferences": {
             "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj": {
               "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj"
-            },
-            "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj": {
-              "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj"
             },
             "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj": {
               "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj"

@@ -1,6 +1,8 @@
 ﻿using System.Threading.Channels;
 using Application.Commands;
 using Application.Ports;
+using Domain.Entities;
+using Domain.Ports;
 using Microsoft.Extensions.Hosting;
 
 namespace Application.Services
@@ -15,9 +17,11 @@ namespace Application.Services
     {
         private readonly Channel<CreateImageGenerationJobCommand> _imageGenerationCommandChannel;
         private readonly IImageGenerationCommandProcessor _generationCommandProcessor;
-        public ImageGenerationJobCommandBackGroundService(IImageGenerationCommandProcessor generationCommandProcessor)
+        private readonly IImageGenerationJobRepository _generationJobRepository;
+        public ImageGenerationJobCommandBackGroundService(IImageGenerationCommandProcessor generationCommandProcessor, IImageGenerationJobRepository generationJobRepository)
         {
             _generationCommandProcessor = generationCommandProcessor;
+            _generationJobRepository = generationJobRepository;
             _imageGenerationCommandChannel = Channel.CreateUnbounded<CreateImageGenerationJobCommand> (new UnboundedChannelOptions
             {
                 SingleReader = true,
@@ -26,11 +30,26 @@ namespace Application.Services
             });
         }
 
+        private async Task LoadPendingCommandsAsync(CancellationToken cancellationToken = default)
+        {
+            var imageJobs = await _generationJobRepository.GetAllAsync(cancellationToken);
+            var imageJobsPending = imageJobs.Where(x => x.State == ImageGenerationJobStates.Pending);
+
+            foreach (var imageGenerationJob in imageJobsPending)
+            {
+                var cmd = new CreateImageGenerationJobCommand(imageGenerationJob.Id, imageGenerationJob.InputText);
+
+                await _imageGenerationCommandChannel.Writer.WriteAsync(cmd, cancellationToken);
+            }
+        }
+
         public Task StartAsync(CancellationToken cancellationToken)
         {
             Task.Run(async () =>
             {
-                //TO DO Get back pending jobs from database, if any
+                //Get back pending jobs from database, if any
+                await LoadPendingCommandsAsync(cancellationToken);
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     if (await _imageGenerationCommandChannel.Reader.WaitToReadAsync(cancellationToken))

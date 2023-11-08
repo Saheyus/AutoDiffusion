@@ -9,6 +9,7 @@
       "Batch/1.0.0": {
         "dependencies": {
           "Application": "1.0.0",
+          "Endpoints": "1.0.0",
           "MediatR": "12.1.1",
           "Microsoft.Extensions.Hosting": "7.0.1"
         },
@@ -427,7 +428,6 @@
       "Application/1.0.0": {
         "dependencies": {
           "Domain": "1.0.0",
-          "Endpoints": "1.0.0",
           "Infrastructure": "1.0.0",
           "MediatR": "12.1.1",
           "Microsoft.Extensions.Caching.Abstractions": "7.0.0",
@@ -439,12 +439,18 @@
         }
       },
       "Domain/1.0.0": {
+        "dependencies": {
+          "MediatR": "12.1.1",
+          "MediatR.Contracts": "2.0.1",
+          "Microsoft.Extensions.Caching.Abstractions": "7.0.0"
+        },
         "runtime": {
           "Domain.dll": {}
         }
       },
       "Endpoints/1.0.0": {
         "dependencies": {
+          "Application": "1.0.0",
           "MediatR": "12.1.1"
         },
         "runtime": {

@@ -36,3 +36,10 @@ F:\Projets\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.dll
 F:\Projets\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\refint\Endpoints.dll
 F:\Projets\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.pdb
 F:\Projets\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\ref\Endpoints.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Application.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Domain.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Infrastructure.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Application.pdb
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Domain.pdb
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\bin\Debug\net7.0\Infrastructure.pdb
+C:\DEV\Olympp\AutoDiffusion\Back\Endpoints\obj\Debug\net7.0\Endpoints.csproj.CopyComplete

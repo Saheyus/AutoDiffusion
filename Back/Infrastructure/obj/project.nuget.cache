@@ -1,8 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "64DlMackBMvuFg73qaO7n4vKKAcScqubyH8DD82J9ykRCEFP8JGot6vsllkwnKqcQ3d0c8CgmXvO6g8LrOl50w==",
+  "dgSpecHash": "9yh1VV6RCwoCGlNp1jqMD9imYGob+Vul93bXzLo76NAObyVwnDAAapMC6OGkC7JFBm5C6gZ9QWeWr8XBBwwi9A==",
   "success": true,
   "projectFilePath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\roman.silagadze\\.nuget\\packages\\mediatr\\12.1.1\\mediatr.12.1.1.nupkg.sha512",
+    "C:\\Users\\roman.silagadze\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\roman.silagadze\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\7.0.0\\microsoft.extensions.caching.abstractions.7.0.0.nupkg.sha512",
+    "C:\\Users\\roman.silagadze\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512",
+    "C:\\Users\\roman.silagadze\\.nuget\\packages\\microsoft.extensions.primitives\\7.0.0\\microsoft.extensions.primitives.7.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

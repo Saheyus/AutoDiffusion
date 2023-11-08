@@ -44,3 +44,4 @@ F:\Projets\AutoDiffusion\Back\Domain\obj\Debug\net7.0\Domain.dll
 F:\Projets\AutoDiffusion\Back\Domain\obj\Debug\net7.0\refint\Domain.dll
 F:\Projets\AutoDiffusion\Back\Domain\obj\Debug\net7.0\Domain.pdb
 F:\Projets\AutoDiffusion\Back\Domain\obj\Debug\net7.0\ref\Domain.dll
+C:\DEV\Olympp\AutoDiffusion\Back\Domain\obj\Debug\net7.0\Domain.csproj.AssemblyReference.cache

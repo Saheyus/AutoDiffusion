@@ -35,9 +35,6 @@
               "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj": {
                 "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Domain\\Domain.csproj"
               },
-              "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj": {
-                "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj"
-              },
               "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj": {
                 "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Infrastructure\\Infrastructure.csproj"
               }
@@ -131,74 +128,17 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
-            "MediatR.Contracts": {
-              "target": "Package",
-              "version": "[2.0.1, )"
-            }
-          },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
-        "projectName": "Endpoints",
-        "projectPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\Endpoints.csproj",
-        "packagesPath": "C:\\Users\\roman.silagadze\\.nuget\\packages\\",
-        "outputPath": "C:\\DEV\\Olympp\\AutoDiffusion\\Back\\Endpoints\\obj\\",
-        "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
-        "configFilePaths": [
-          "C:\\Users\\roman.silagadze\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
-        ],
-        "originalTargetFrameworks": [
-          "net7.0"
-        ],
-        "sources": {
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "net7.0": {
-            "targetAlias": "net7.0",
-            "projectReferences": {}
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        }
-      },
-      "frameworks": {
-        "net7.0": {
-          "targetAlias": "net7.0",
-          "dependencies": {
             "MediatR": {
               "target": "Package",
               "version": "[12.1.1, )"
+            },
+            "MediatR.Contracts": {
+              "target": "Package",
+              "version": "[2.0.1, )"
+            },
+            "Microsoft.Extensions.Caching.Abstractions": {
+              "target": "Package",
+              "version": "[7.0.0, )"
             }
           },
           "imports": [

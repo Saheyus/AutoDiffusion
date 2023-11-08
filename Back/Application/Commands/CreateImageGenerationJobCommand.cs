@@ -10,5 +10,11 @@ namespace Application.Commands
         }
 
         public string InputText { get; }
+
+        public CreateImageGenerationJobCommand(Guid id, string inputText)
+        {
+            Id = id;
+            InputText = inputText;
+        }
     }
 }
