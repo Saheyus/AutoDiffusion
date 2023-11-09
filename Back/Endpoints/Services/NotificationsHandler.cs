@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Endpoints.Services
 {
-    public class NotificationsHandler : INotificationHandler<ImageGenerationJobNotification>
+    public sealed class NotificationsHandler : INotificationHandler<ImageGenerationJobNotification>
     {
         public Task Handle(ImageGenerationJobNotification notification, CancellationToken cancellationToken)
         {

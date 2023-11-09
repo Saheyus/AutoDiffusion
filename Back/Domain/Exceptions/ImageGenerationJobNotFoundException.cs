@@ -1,6 +1,6 @@
 ﻿namespace Domain.Exceptions
 {
-    public class ImageGenerationJobNotFoundException : Exception
+    public sealed class ImageGenerationJobNotFoundException : Exception
     {
         public ImageGenerationJobNotFoundException(Guid id) : base ($"ImageGenerationJob {id} not found!")
         {

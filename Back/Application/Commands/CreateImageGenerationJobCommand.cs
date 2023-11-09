@@ -2,7 +2,7 @@
 
 namespace Application.Commands
 {
-    public class CreateImageGenerationJobCommand : ApplicationCommand<ImageGenerationJob>
+    public sealed class CreateImageGenerationJobCommand : ApplicationCommand<ImageGenerationJob>
     {
         public CreateImageGenerationJobCommand(string inputText)
         {

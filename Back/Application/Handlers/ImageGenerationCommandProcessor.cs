@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.Handlers
 {
-    public class ImageGenerationCommandProcessor : IImageGenerationCommandProcessor
+    public sealed class ImageGenerationCommandProcessor : IImageGenerationCommandProcessor
     {
         private readonly IPythonScriptInvoker _pythonScriptInvoker;
         private readonly IPublisher _publisher;

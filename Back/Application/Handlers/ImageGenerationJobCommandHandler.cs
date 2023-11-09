@@ -7,7 +7,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Application.Handlers
 {
-    public class ImageGenerationJobCommandHandler : IRequestHandler<CreateImageGenerationJobCommand, ImageGenerationJob>
+    public sealed class ImageGenerationJobCommandHandler : IRequestHandler<CreateImageGenerationJobCommand, ImageGenerationJob>
     {
         private readonly IMemoryCache _cache;
         private readonly TimeSpan _cacheSlidingExpiration = TimeSpan.FromMinutes(10);

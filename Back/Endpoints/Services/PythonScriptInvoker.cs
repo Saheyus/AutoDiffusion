@@ -6,7 +6,7 @@ using Application.Ports;
 
 namespace Endpoints.Services
 {
-    public class PythonScriptInvoker : IPythonScriptInvoker 
+    public sealed class PythonScriptInvoker : IPythonScriptInvoker 
     {
         private readonly string _pathToProcess;
         private readonly string _scriptToInvoke;

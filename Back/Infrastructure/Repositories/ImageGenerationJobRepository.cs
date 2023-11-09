@@ -5,7 +5,7 @@ using Domain.Ports;
 
 namespace Infrastructure.Repositories
 {
-    public class ImageGenerationJobRepository : IImageGenerationJobRepository
+    public sealed class ImageGenerationJobRepository : IImageGenerationJobRepository
     {
         private static readonly ConcurrentDictionary<Guid, ImageGenerationJob> Generations = new();
 
