@@ -14,6 +14,7 @@ namespace Domain.Events
 
     public abstract class ImageGenerationJobEvent : INotification
     {
+        public string Name => GetType().Name;
         public DateTime EventTime { get; } = DateTime.UtcNow;
     }
 }

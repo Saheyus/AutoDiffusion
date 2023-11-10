@@ -15,6 +15,8 @@ using Microsoft.Extensions.Hosting;
 Console.WriteLine("Hello, World!");
 try
 {
+    const string autoDiffusion = "AutoDiffusion";
+
     var builder = Host.CreateApplicationBuilder(args);
 
     void MediatRConfiguration(MediatRServiceConfiguration cfg)
@@ -23,26 +25,32 @@ try
             typeof(ImageGenerationJobEventHandler).Assembly,
             typeof(ImageGenerationJobCommandHandler).Assembly,
             typeof(NotificationsHandler).Assembly
-            );
+            ); 
         cfg.NotificationPublisher = new ParallelNoWaitPublisher();
     }
 
     PythonScriptInvoker PythonScriptInvokerConfiguration(IServiceProvider p)
     {
-        const string solutionName = "AutoDiffusion";
         var currentDir = Directory.GetCurrentDirectory();
-        var idx = currentDir.IndexOf(solutionName, StringComparison.OrdinalIgnoreCase);
-        var solutionRoot = currentDir[..(idx + solutionName.Length)];
+        var idx = currentDir.IndexOf(autoDiffusion, StringComparison.OrdinalIgnoreCase);
+        var solutionRoot = currentDir[..(idx + autoDiffusion.Length)];
         var scriptsDirectory = solutionRoot + @"\Tests\Batch\Scripts";
         const string scriptToInvoke = "python.py";
 
         return new PythonScriptInvoker("cmd.exe", scriptsDirectory, scriptToInvoke);
     }
 
+    builder.Services.AddHttpClient(autoDiffusion, cl =>
+    {
+        cl.BaseAddress = new Uri("http://localhost:7071");
+        cl.Timeout = TimeSpan.FromMicroseconds(120);
+    });
+
     builder.Services.AddMemoryCache(options =>
     {
         options.ExpirationScanFrequency = TimeSpan.FromMinutes(1);
     });
+
     builder.Services.AddMediatR(MediatRConfiguration);
     builder.Services.AddSingleton<IImageGenerationJobRepository, CachedImageGenerationJobRepository>();
     builder.Services.AddSingleton<IPythonScriptInvoker, PythonScriptInvoker>(PythonScriptInvokerConfiguration);

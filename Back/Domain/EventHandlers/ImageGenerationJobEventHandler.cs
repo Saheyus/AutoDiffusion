@@ -46,7 +46,7 @@ namespace Domain.EventHandlers
             await _imageGenerationJobRepository.SaveAsync(imageGenerationJob, cancellationToken);
 
             //Publish notification
-            await _publisher.Publish(new ImageGenerationJobNotification(imageGenerationJob), cancellationToken);
+            await _publisher.Publish(new ImageGenerationJobNotification(@event), cancellationToken);
         }
 
         public async Task Handle(ImageGenerationJobStartedEvent @event, CancellationToken cancellationToken = default)

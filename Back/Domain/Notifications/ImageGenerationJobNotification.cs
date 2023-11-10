@@ -1,19 +1,19 @@
-﻿using Domain.Entities;
+﻿using Domain.Events;
 using MediatR;
 
 namespace Domain.Notifications
 {
     public class ImageGenerationJobNotification : INotification
     {
-        public Guid ImageJobGenerationId { get; }
-        public ImageGenerationJobStates ImageGenerationJobState { get; }
-        public IEnumerable<Uri> ImageGenerationImageUris { get; }
+        public DateTime DateTime { get; }
+        public string NotificationType { get; }
+        public object Data { get; }
 
-        public ImageGenerationJobNotification(ImageGenerationJob imageGenerationJob)
+        public ImageGenerationJobNotification(ImageGenerationJobEvent @event)
         {
-            ImageJobGenerationId = imageGenerationJob.Id;
-            ImageGenerationJobState = imageGenerationJob.State;
-            ImageGenerationImageUris = imageGenerationJob.ImageUris;
+            NotificationType = @event.Name;
+            DateTime = DateTime.UtcNow;
+            Data = @event;
         }
     }
 }
