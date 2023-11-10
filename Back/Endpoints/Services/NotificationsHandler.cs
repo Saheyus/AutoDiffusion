@@ -38,7 +38,7 @@ namespace Endpoints.Services
                 cancellationToken.ThrowIfCancellationRequested();
 
                 using var client = _clientFactory.CreateClient(clientName);
-                using var content = CreateContent(notification);
+                using var content = CreateContent(notification); 
                 await client.PostAsync(callBackUri, content, cancellationToken);
             });
 

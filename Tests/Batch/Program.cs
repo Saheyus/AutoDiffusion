@@ -15,6 +15,9 @@ using Microsoft.Extensions.Hosting;
 Console.WriteLine("Hello, World!");
 try
 {
+    //waiting for autodiffusion font app loading
+    await Task.Delay(10000);
+
     const string autoDiffusion = "AutoDiffusion";
 
     var builder = Host.CreateApplicationBuilder(args);
@@ -43,8 +46,8 @@ try
     builder.Services.AddHttpClient(autoDiffusion, cl =>
     {
         cl.BaseAddress = new Uri("http://localhost:7071");
-        cl.Timeout = TimeSpan.FromMicroseconds(120);
-    });
+        cl.Timeout = TimeSpan.FromSeconds(120);
+    }).SetHandlerLifetime(Timeout.InfiniteTimeSpan);
 
     builder.Services.AddMemoryCache(options =>
     {
