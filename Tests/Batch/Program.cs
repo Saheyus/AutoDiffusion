@@ -5,7 +5,6 @@ using Application.Handlers;
 using Application.Ports;
 using Application.Services;
 using Domain.EventHandlers;
-using Domain.Notifications;
 using Domain.Ports;
 using Endpoints.Services;
 using Infrastructure.Repositories;
@@ -45,7 +44,7 @@ try
         options.ExpirationScanFrequency = TimeSpan.FromMinutes(1);
     });
     builder.Services.AddMediatR(MediatRConfiguration);
-    builder.Services.AddSingleton<IImageGenerationJobRepository, ImageGenerationJobRepository>();
+    builder.Services.AddSingleton<IImageGenerationJobRepository, CachedImageGenerationJobRepository>();
     builder.Services.AddSingleton<IPythonScriptInvoker, PythonScriptInvoker>(PythonScriptInvokerConfiguration);
     builder.Services.AddSingleton<IImageGenerationCommandQueue, ImageGenerationJobCommandBackGroundService>();
     builder.Services.AddSingleton<IImageGenerationCommandProcessor, ImageGenerationCommandProcessor>();

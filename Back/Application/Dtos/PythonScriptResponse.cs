@@ -8,12 +8,13 @@
             Output = output;
             ErrorOutput = errorOutput;
             HasErrors = !string.IsNullOrEmpty(ErrorOutput);
+            IsSuccessful = exitCode != 0;
         }
 
         public int ExitCode { get; }
         public string Output { get; }
         public string? ErrorOutput { get; }
-        public bool IsSuccessful => ExitCode != 0;
+        public bool IsSuccessful { get; }
         public bool HasErrors { get; }
     }
 }

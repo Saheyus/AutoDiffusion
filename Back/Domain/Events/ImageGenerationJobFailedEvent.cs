@@ -1,6 +1,6 @@
 ﻿namespace Domain.Events
 {
-    public sealed class ImageGenerationJobFailedEvent : DomainEvent<Exception>
+    public sealed class ImageGenerationJobFailedEvent : ImageGenerationJobEvent<Exception>
     {
         public Guid ImageGenerationJobId { get; }
 

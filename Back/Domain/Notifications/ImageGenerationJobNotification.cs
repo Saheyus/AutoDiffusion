@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Domain.Notifications
 {
-    public sealed class ImageGenerationJobNotification : INotification
+    public class ImageGenerationJobNotification : INotification
     {
         public Guid ImageJobGenerationId { get; }
         public ImageGenerationJobStates ImageGenerationJobState { get; }

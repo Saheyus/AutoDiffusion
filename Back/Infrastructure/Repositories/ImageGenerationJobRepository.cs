@@ -5,7 +5,7 @@ using Domain.Ports;
 
 namespace Infrastructure.Repositories
 {
-    public sealed class ImageGenerationJobRepository : IImageGenerationJobRepository
+    internal sealed class ImageGenerationJobRepository : IImageGenerationJobRepository
     {
         private static readonly ConcurrentDictionary<Guid, ImageGenerationJob> Generations = new();
 
@@ -22,9 +22,9 @@ namespace Infrastructure.Repositories
             return Task.FromResult<IEnumerable<ImageGenerationJob>>(Generations.Values);
         }
 
-        public Task SaveAsync(ImageGenerationJob imageGeneration, CancellationToken cancellationToken = default)
+        public Task SaveAsync(ImageGenerationJob imageGenerationJob, CancellationToken cancellationToken = default)
         {
-            Generations[imageGeneration.Id] = imageGeneration;
+            Generations[imageGenerationJob.Id] = imageGenerationJob;
             return Task.CompletedTask;
         }
     }

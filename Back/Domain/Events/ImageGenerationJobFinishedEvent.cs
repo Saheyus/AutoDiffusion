@@ -1,6 +1,6 @@
 ﻿namespace Domain.Events
 {
-    public sealed class ImageGenerationJobFinishedEvent : ApplicationEvent
+    public sealed class ImageGenerationJobFinishedEvent : ImageGenerationJobEvent
     {
         public int ExitCode { get; }
         public string Output { get; }

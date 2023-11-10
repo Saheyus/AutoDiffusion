@@ -1,0 +1,37 @@
+<mxfile host="Electron" modified="2023-11-09T10:29:44.149Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.0 Chrome/114.0.5735.289 Electron/25.8.3 Safari/537.36" etag="uZQMouQFvpdvWes6BR9P" version="22.0.0" type="device">
+  <diagram name="Project structure" id="GJ6cTeNhudmBKszLmV0g">
+    <mxGraphModel dx="1276" dy="614" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="A4oR2ROHZUrj2O_3XLI--1" target="A4oR2ROHZUrj2O_3XLI--4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="A4oR2ROHZUrj2O_3XLI--1" target="A4oR2ROHZUrj2O_3XLI--5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="A4oR2ROHZUrj2O_3XLI--1" target="A4oR2ROHZUrj2O_3XLI--20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--1" value="Domain" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="370" y="260" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="A4oR2ROHZUrj2O_3XLI--4" target="A4oR2ROHZUrj2O_3XLI--6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--4" value="Application" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="370" y="130" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--5" value="Infrastructure" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="370" y="390" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--6" value="Endpoints" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="260" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="A4oR2ROHZUrj2O_3XLI--20" value="Endpoints" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="570" y="260" width="80" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

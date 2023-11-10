@@ -2,17 +2,17 @@
 
 namespace Domain.Events
 {
-    public abstract class DomainEvent<T> : ApplicationEvent
+    public abstract class ImageGenerationJobEvent<T> : ImageGenerationJobEvent
     {
         public T Data { get; }
 
-        protected DomainEvent(T data)
+        protected ImageGenerationJobEvent(T data)
         {
             Data = data;
         }
     }
 
-    public abstract class ApplicationEvent : INotification
+    public abstract class ImageGenerationJobEvent : INotification
     {
         public DateTime EventTime { get; } = DateTime.UtcNow;
     }
