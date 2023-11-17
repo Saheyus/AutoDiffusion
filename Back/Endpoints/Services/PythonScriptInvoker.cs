@@ -1,11 +1,12 @@
-﻿using System.Diagnostics;
+﻿ using System.Diagnostics;
 using System.Text;
-using Endpoints.Dtos;
-using Endpoints.Ports;
+using Application.Dtos;
+using Application.Ports;
+
 
 namespace Endpoints.Services
 {
-    public class PythonScriptInvoker : IPythonScriptInvoker 
+    public sealed class PythonScriptInvoker : IPythonScriptInvoker 
     {
         private readonly string _pathToProcess;
         private readonly string _scriptToInvoke;

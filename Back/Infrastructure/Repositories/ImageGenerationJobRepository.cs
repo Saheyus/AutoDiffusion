@@ -1,19 +1,20 @@
 ﻿using System.Collections.Concurrent;
 using Domain.Entities;
-using Infrastructure.Ports;
+using Domain.Exceptions;
+using Domain.Ports;
 
 namespace Infrastructure.Repositories
 {
-    public class ImageGenerationJobRepository : IImageGenerationJobRepository
+    internal sealed class ImageGenerationJobRepository : IImageGenerationJobRepository
     {
         private static readonly ConcurrentDictionary<Guid, ImageGenerationJob> Generations = new();
 
-        public Task<ImageGenerationJob?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+        public Task<ImageGenerationJob> GetAsync(Guid id, CancellationToken cancellationToken = default)
         {
             if (Generations.TryGetValue(id, out var generation))
-                return Task.FromResult(generation)!;
+                return Task.FromResult(generation);
 
-            return Task.FromResult<ImageGenerationJob?>(null);
+            throw new ImageGenerationJobNotFoundException(id);
         }
 
         public Task<IEnumerable<ImageGenerationJob>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -21,9 +22,9 @@ namespace Infrastructure.Repositories
             return Task.FromResult<IEnumerable<ImageGenerationJob>>(Generations.Values);
         }
 
-        public Task SaveAsync(ImageGenerationJob imageGeneration, CancellationToken cancellationToken = default)
+        public Task SaveAsync(ImageGenerationJob imageGenerationJob, CancellationToken cancellationToken = default)
         {
-            Generations[imageGeneration.Id] = imageGeneration;
+            Generations[imageGenerationJob.Id] = imageGenerationJob;
             return Task.CompletedTask;
         }
     }

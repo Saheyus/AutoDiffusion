@@ -2,7 +2,7 @@
 
 namespace Application.Commands
 {
-    public class CreateImageGenerationJobCommand : ApplicationCommand<ImageGenerationJob>
+    public sealed class CreateImageGenerationJobCommand : ApplicationCommand<ImageGenerationJob>
     {
         public CreateImageGenerationJobCommand(string inputText)
         {
@@ -10,5 +10,11 @@ namespace Application.Commands
         }
 
         public string InputText { get; }
+
+        public CreateImageGenerationJobCommand(Guid id, string inputText)
+        {
+            Id = id;
+            InputText = inputText;
+        }
     }
 }

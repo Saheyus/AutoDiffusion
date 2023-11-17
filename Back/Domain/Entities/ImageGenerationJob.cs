@@ -5,6 +5,7 @@ namespace Domain.Entities
     //Aggregate with single entity
     public sealed class ImageGenerationJob : IAggregate<ImageGenerationJob>
     {
+        private readonly ICollection<Uri> _imageUris;
         public ImageGenerationJob(Guid id, string inputText)
         {
             Id = id;
@@ -12,6 +13,7 @@ namespace Domain.Entities
             State = ImageGenerationJobStates.Pending;
             LastModified = DateTime.UtcNow;
             Created = DateTime.UtcNow;
+            _imageUris = new List<Uri>();
         }
 
         public string InputText { get; }
@@ -24,7 +26,22 @@ namespace Domain.Entities
 
         public ImageGenerationJobStates State { get; private set; }
 
-        public void ChangeState(ImageGenerationJobStates state)
+        public IEnumerable<Uri> ImageUris => _imageUris;
+
+        internal void AddImageUri(Uri uri)
+        {
+            _imageUris.Add(uri);
+        }
+
+        internal void AddImageUris(IEnumerable<Uri> uris)
+        {
+            foreach (var uri in uris)
+            {
+                AddImageUri(uri);
+            }
+        }
+
+        internal void ChangeState(ImageGenerationJobStates state)
         {
             State = state;
             LastModified = DateTime.UtcNow;

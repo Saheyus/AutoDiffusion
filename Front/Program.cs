@@ -1,4 +1,5 @@
 using Autodiffusion.Services;
+using AutoDiffusion;
 using AutoDiffusion.Data;
 using AutoDiffusion.Services;
 using Microsoft.EntityFrameworkCore;
@@ -36,5 +37,6 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+app.MapControllers();
 
 app.Run();
