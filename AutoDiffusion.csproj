@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<WebAssemblyDebugging>true</WebAssemblyDebugging>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 
 
@@ -27,7 +28,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
-	<Protobuf Include="Protobuf\GPTautoPrompt.proto" GrpcServices="Client" />
+	<!--<Protobuf Include="Protobuf\GPTautoPrompt.proto" GrpcServices="Client" />-->
   </ItemGroup>
 
 
