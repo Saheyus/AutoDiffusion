@@ -37,67 +37,77 @@ namespace Autodiffusion.Services
             }
         }
 
-        public async Task<List<string>> GenerateFullNameAsync(string language, string gender, int chanceForSecondFirstName, int count = 1)
+        public async Task<(List<string> FullNames, string ErrorMessage)> GenerateFullNameAsync(string language, string gender, int chanceForSecondFirstName, int count = 1)
         {
             List<string> fullNames = new List<string>();
 
-            // Fetch existing names from the FullNames table
-            List<string> existingFullNames = await _context.FullNames.Select(f => f.FullName).ToListAsync();
-
             for (int i = 0; i < count; i++)
             {
-                string fullName = "";
-
-                do
+                // Fetch first name and check for errors
+                var (firstName, firstNameError) = await GenerateNameAsync(language, gender);
+                if (firstNameError)
                 {
-                    // Fetch first name
-                    string firstName = await GenerateNameAsync(language, gender);
+                    return (null, "Failed to generate a first name due to no names being found for the specified criteria.");
+                }
 
-                    // Decide whether to add a second first name
-                    bool hasSecondFirstName = _random.Next(100) < chanceForSecondFirstName;
-                    if (hasSecondFirstName)
+                // Decide whether to add a second first name
+                bool hasSecondFirstName = _random.Next(100) < chanceForSecondFirstName;
+                if (hasSecondFirstName)
+                {
+                    var (secondFirstName, secondNameError) = await GenerateNameAsync(language, gender);
+                    if (secondNameError)
                     {
-                        string secondFirstName = await GenerateNameAsync(language, gender);
-                        firstName += " " + secondFirstName;
+                        return (null, "Failed to generate a second first name due to no names being found for the specified criteria.");
                     }
+                    firstName += " " + secondFirstName;
+                }
 
-                    // Fetch last name
-                    string lastName = await GenerateNameAsync(language, "Last");
+                // Fetch last name
+                var (lastName, lastNameError) = await GenerateNameAsync(language, "Last");
+                if (lastNameError)
+                {
+                    // Handle the error for the last name
+                    return (null, "Failed to generate a last name due to no names being found for the specified criteria.");
+                }
 
-                    // Combine first and last names
-                    fullName = $"{firstName} {lastName}";
-
-                } while (fullNames.Contains(fullName) || existingFullNames.Contains(fullName));
-
+                string fullName = $"{firstName} {lastName}";
                 fullNames.Add(fullName);
             }
 
-            return fullNames;
+            return (fullNames, null);
         }
 
-        private async Task<string> GenerateNameAsync(string language, string gender)
+        private async Task<(string Name, bool IsError)> GenerateNameAsync(string language, string gender)
         {
-            // Query the database for names of the given gender and type
             var names = await _context.GeneratedWords
                 .Where(x => x.Type.Equals(gender) && x.Language.Equals(language))
                 .ToListAsync();
 
-            if (names.Count == 0)
+            if (!names.Any())
             {
-                throw new InvalidOperationException("No names found for the specified gender and language.");
+                // Return with IsError set to true to indicate failure
+                return (null, true);
             }
 
-            // Select a random name
             int index = _random.Next(names.Count);
-            return names[index].Name;
+
+            // Name is found, IsError is false
+            return (names[index].Name, false);
         }
 
         public async Task SaveGeneratedFullNameAsync(FullNameModel model)
         {
             try
             {
-                _context.FullNames.Add(model);
-                await _context.SaveChangesAsync();
+                if (model.Gender != null && model.Language != null)
+                {
+                    _context.FullNames.Add(model);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    Console.WriteLine("Error in SaveGeneratedFullNameAsync: Gender or Language is null");
+                }
             }
             catch (Exception ex)
             {

@@ -36,7 +36,7 @@ public class RandomWordService
         string currentLetter = "", randomWord = "", lastLetters = " ";
         int numberOfWords = 20;
 
-        ConfigModel config = await _configService.GetConfig();
+        WordParametersModel config = await _configService.GetConfig();
 
         _nextLetterProbabilities.LoadFromDatabase(connection, config.SelectedLanguage, config.SelectedCategory);
         var existingNames = await _nameService.GetNamesByCountryAndCategoryAsync(config.SelectedLanguage, config.SelectedCategory);
@@ -119,7 +119,7 @@ public class RandomWordService
         }
     }
 
-    private List<(string NextLetter, double Probability)> FindProbabilitiesByLastLetters(string lastLetters, int currentWordLength, ConfigModel config)
+    private List<(string NextLetter, double Probability)> FindProbabilitiesByLastLetters(string lastLetters, int currentWordLength, WordParametersModel config)
     {
         List<(string NextLetter, double Probability)> probabilities = new();
 
@@ -228,7 +228,7 @@ public class RandomWordService
         return word;
     }
 
-    private static bool ShouldGenerateAnotherLetter(string currentWord, string currentLetter, ConfigModel config)
+    private static bool ShouldGenerateAnotherLetter(string currentWord, string currentLetter, WordParametersModel config)
     {
         var currentLength = currentWord.Length;
         var additionalLength = 0;

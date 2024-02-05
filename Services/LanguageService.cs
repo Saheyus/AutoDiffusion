@@ -40,6 +40,19 @@ namespace Autodiffusion.Services
             await AddLanguageAsync(newLanguage);
             await _configService.CreateDefaultConfigAsync(newLanguage.Language);
         }
+
+        public async Task DeleteLanguageAsync(string languageName)
+        {
+            var language = await _context.Languages.SingleOrDefaultAsync(l => l.Language == languageName);
+            if (language == null)
+            {
+                throw new Exception("La langue spécifiée n'existe pas");
+            }
+
+            _context.Languages.Remove(language);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
 

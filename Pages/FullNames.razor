@@ -42,6 +42,13 @@
 
         <button @onclick="GenerateRandomNames" class="btn btn-light btn-rounded btn-lg fs-5">Génération aléatoire</button>
 
+        @if (_errorMessage != null)
+        {
+            <div class="alert alert-danger" role="alert">
+                @_errorMessage
+            </div>
+        }
+
         <div style="max-width: 90%;">
             <div class="d-flex flex-wrap mt-3">
                 @foreach (FullNameModel fullName in _generatedFullNames)
@@ -81,6 +88,7 @@
     private string _selectedGender = "Male";
     private string _selectedLanguage = "English";
     private int _chanceForSecondFirstName = 0;
+    private string? _errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,13 +103,22 @@
 
     private async void GenerateRandomNames()
     {
-        var fullNames = await FullNameService.GenerateFullNameAsync(_selectedLanguage, _selectedGender, _chanceForSecondFirstName, 18);
-        _generatedFullNames.Clear();
-        foreach (var name in fullNames)
+        var (fullNames, errorMessage) = await FullNameService.GenerateFullNameAsync(_selectedLanguage, _selectedGender, _chanceForSecondFirstName, 18);
+        if (errorMessage != null)
         {
-            _generatedFullNames.Add(new FullNameModel { FullName = name, Gender = _selectedGender, Language = _selectedLanguage });
+            _errorMessage = errorMessage;
+            _generatedFullNames.Clear();
         }
-        StateHasChanged(); 
+        else
+        {
+            _errorMessage = null;
+            _generatedFullNames.Clear();
+            foreach (var name in fullNames)
+            {
+                _generatedFullNames.Add(new FullNameModel { FullName = name, Gender = _selectedGender, Language = _selectedLanguage });
+            }
+        }
+        StateHasChanged();
     }
 
     private async Task SaveName(FullNameModel name)

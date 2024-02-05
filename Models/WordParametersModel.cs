@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AutoDiffusion.Models
 {
     [Table("WordParameters")]
-    public class ConfigModel
+    public class WordParametersModel
     {
         [Key]
         [Column("ID")]
@@ -12,6 +12,9 @@ namespace AutoDiffusion.Models
 
         [Column("Language")]
         public string? SelectedLanguage { get; set; }
+
+        [ForeignKey("Language")]
+        public LanguageModel LanguageModel { get; set; }
 
         [Column("Categorie")]
         public string? SelectedCategory { get; set; }

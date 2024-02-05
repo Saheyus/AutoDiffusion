@@ -11,6 +11,6 @@ namespace AutoDiffusion.Models
         [NotMapped]
         public int ConfigModelId { get; set; }
         [NotMapped]
-        public ConfigModel? Config { get; set; }
+        public WordParametersModel? Config { get; set; }
     }
 }

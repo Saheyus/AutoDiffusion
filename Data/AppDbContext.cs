@@ -9,12 +9,11 @@ namespace AutoDiffusion.Data
         {
         }
 
-        public DbSet<NameModel> Names { get; set; }
-        public DbSet<ProbabilityModel> Probabilities { get; set; }
-        public DbSet<ConfigModel> Config { get; set; }
-        public DbSet<GeneratedWordModel> GeneratedWords { get; set; }
-        public DbSet<LanguageModel> Languages { get; set; }
-        public DbSet<FullNameModel> FullNames { get; set; }
-
+        public DbSet<NameModel>? Names { get; set; }
+        public DbSet<ProbabilityModel>? Probabilities { get; set; }
+        public DbSet<WordParametersModel>? WordParameters { get; set; }
+        public DbSet<GeneratedWordModel>? GeneratedWords { get; set; }
+        public DbSet<LanguageModel>? Languages { get; set; }
+        public DbSet<FullNameModel>? FullNames { get; set; }
     }
 }

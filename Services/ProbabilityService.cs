@@ -143,7 +143,7 @@ namespace AutoDiffusion.Services
             var config = _configService.GetConfig();
             config.Result.MinLetters = minLetters;
             config.Result.MaxLetters = maxLetters;
-            var existingRecord = _dbContext.Config
+            var existingRecord = _dbContext.WordParameters
                 .FirstOrDefault(wp =>
                     wp.SelectedLanguage == language &&
                     wp.SelectedCategory == category);
@@ -157,7 +157,7 @@ namespace AutoDiffusion.Services
             else
             {
                 // Create a new record
-                var newRecord = new ConfigModel()
+                var newRecord = new WordParametersModel()
                 {
                     SelectedLanguage = language,
                     SelectedCategory = category,
@@ -166,7 +166,7 @@ namespace AutoDiffusion.Services
                     FullName = 0,
                     FullPlaceName = 0
                 };
-                _dbContext.Config.Add(newRecord);
+                _dbContext.WordParameters.Add(newRecord);
             }
 
             _dbContext.SaveChanges();
@@ -207,8 +207,8 @@ namespace AutoDiffusion.Services
         public async Task DeleteLanguageAndCascade(string languageToDelete)
         {
             // Delete records from related tables
-            var wordParameters = _dbContext.Config.Where(wp => wp.SelectedLanguage == languageToDelete);
-            _dbContext.Config.RemoveRange(wordParameters);
+            var wordParameters = _dbContext.WordParameters.Where(wp => wp.SelectedLanguage == languageToDelete);
+            _dbContext.WordParameters.RemoveRange(wordParameters);
 
             var probabilities = _dbContext.Probabilities.Where(p => p.Language == languageToDelete);
             _dbContext.Probabilities.RemoveRange(probabilities);

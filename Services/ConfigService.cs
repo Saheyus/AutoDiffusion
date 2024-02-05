@@ -8,18 +8,18 @@ namespace AutoDiffusion.Services
     {
         private readonly AppDbContext _context;
         private readonly IConfiguration _dbConfiguration;
-        public ConfigModel Config { get; set; }
+        public WordParametersModel Config { get; set; }
 
         public ConfigService(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
             _dbConfiguration = configuration;
-            Config = new ConfigModel();
+            Config = new WordParametersModel();
         }
 
-        public Task<ConfigModel> GetConfig()
+        public Task<WordParametersModel> GetConfig()
         {
-            return Task.FromResult(new ConfigModel
+            return Task.FromResult(new WordParametersModel
             {
                 SelectedLanguage = Config.SelectedLanguage,
                 SelectedCategory = Config.SelectedCategory,
@@ -92,11 +92,11 @@ namespace AutoDiffusion.Services
         public async Task CreateDefaultConfigAsync(string language)
         {
             List<string> categories = new List<string> { "Male", "Female", "Last" };
-            List<ConfigModel> defaultConfigs = new List<ConfigModel>();
+            List<WordParametersModel> defaultConfigs = new List<WordParametersModel>();
 
             foreach (string category in categories)
             {
-                ConfigModel defaultConfig = new ConfigModel
+                WordParametersModel defaultConfig = new WordParametersModel
                 {
                     SelectedLanguage = language,
                     SelectedCategory = category,
@@ -109,7 +109,7 @@ namespace AutoDiffusion.Services
                 defaultConfigs.Add(defaultConfig);
             }
 
-            await _context.Config.AddRangeAsync(defaultConfigs);
+            await _context.WordParameters.AddRangeAsync(defaultConfigs);
             await _context.SaveChangesAsync();
         }
     }

@@ -6,16 +6,23 @@
 <h1 class="text-white">Languages</h1>
 
 <h5 class="text-white">Add New Language</h5>
-<form @onsubmit="AddLanguage">
-    <input @bind="newLanguage" placeholder="New Language Name" />
-    <button type="submit">Add</button>
+<form @onsubmit="AddLanguage" class="mb-3">
+    <input @bind="newLanguage" placeholder="New Language Name" class="form-control" />
+    <button type="submit" class="btn btn-primary mt-2">Add</button>
 </form>
 
 <h5 class="text-white">Existing Languages</h5>
-<ul>
+<ul class="list-unstyled">
     @foreach (LanguageModel lang in languages)
     {
-        <li class="text-white">@lang.Language</li>
+        <li class="text-white d-flex align-items-center mb-2">
+            <div class="col-1">
+                <span>@lang.Language</span>
+            </div>
+            <div class="col-4">
+                <button class="btn btn-danger" @onclick="() => DeleteLanguage(lang.Language)">Delete</button>
+            </div>
+        </li>
     }
 </ul>
 
@@ -37,5 +44,11 @@
             newLanguage = string.Empty;
             languages = await LanguageService.GetLanguagesAsync();
         }
+    }
+
+    private async Task DeleteLanguage(string languageName)
+    {
+        await LanguageService.DeleteLanguageAsync(languageName);
+        languages = await LanguageService.GetLanguagesAsync();
     }
 }
